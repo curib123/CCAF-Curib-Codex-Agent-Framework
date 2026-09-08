@@ -1,6 +1,14 @@
-# Universal Engineering Workspace
+# AI Workplace Agents
 
-Recommended structure:
+A universal, usage-efficient professional engineering agent framework for AI coding agents such as Codex working on **existing software projects**.
+
+Provide a target project and its **Planning + Requirements Analysis**. The shared agent system discovers the existing codebase, builds a technical implementation plan, implements changes, runs targeted QA and security checks, validates user-facing work from a normal user's perspective, verifies requirements, checkpoints progress, and resumes safely across sessions or usage limits.
+
+## Core workflow
+
+**Analyze → Plan → Implement → Targeted Test → QA → Security when needed → Normal User validation when user-facing → Verify → Checkpoint → Continue**
+
+## Workspace
 
 ```text
 workspace/
@@ -8,40 +16,51 @@ workspace/
 └── YourProject/
 ```
 
-- `agent/` is the reusable professional engineering agent system.
-- `YourProject/` is any existing software project.
-
-You may keep multiple projects beside the same shared agent system:
+One shared `agent/` folder can support multiple projects:
 
 ```text
 workspace/
 ├── agent/
-├── Vrompt/
-├── PocketPOS/
-├── DocumentSystem/
-└── AnotherProject/
+├── ProjectA/
+├── ProjectB/
+└── ProjectC/
 ```
 
-Each project gets its own profile under:
+Each project keeps independent requirements and state under:
 
 ```text
 agent/projects/<project-name>/
 ```
 
-Example:
+## Professional roles
 
-```text
-agent/projects/vrompt/
-agent/projects/pocketpos/
-agent/projects/document-system/
-```
+- **Orchestrator** — priority, routing, checkpoints, completion
+- **Analyst + Planner** — codebase discovery, gap analysis, implementation planning
+- **Engineer** — implementation across the project's actual stack
+- **QA Engineer** — targeted testing, edge cases, regressions
+- **Security Reviewer** — security-sensitive reviews only when needed
+- **Normal User Agent** — real-user usability validation for user-facing work
+- **Verifier** — independent requirement verification
 
-Start from the workspace root and provide:
+## Usage efficiency
 
-1. Target project path
-2. Requirements file path
+The framework is designed to reduce unnecessary model usage:
 
-Example:
+- analyze deeply only when necessary,
+- persist stable architecture facts,
+- inspect only relevant files for each task,
+- use the minimum effective reasoning level,
+- run targeted tests before broad suites,
+- invoke specialized reviewers only when relevant,
+- checkpoint every meaningful work unit.
+
+## Quick start
+
+1. Put `agent/` beside your existing project.
+2. Copy `agent/projects/_example/` or create `agent/projects/<project-name>/`.
+3. Put your Planning + Requirements Analysis into `REQUIREMENTS.md`.
+4. Open your coding environment from the workspace root.
+5. Start with:
 
 ```text
 Read ./agent/AGENTS.md.
@@ -50,9 +69,17 @@ Target project:
 ./YourProject
 
 Requirements:
-./agent/projects/your-project/REQUIREMENTS.md
+./agent/projects/my-project/REQUIREMENTS.md
 
 Start the professional existing-project development loop.
 ```
-"# ai-workplace-agents" 
-"# ai-workplace-agents" 
+
+For detailed instructions, see [`agent/HOW_TO_USE.md`](agent/HOW_TO_USE.md).
+
+## Philosophy
+
+**Reuse before rewriting. Inspect before assuming. Implement instead of only recommending. Test before claiming. Checkpoint before context is lost.**
+
+## License
+
+MIT License. See [`LICENSE`](LICENSE).
