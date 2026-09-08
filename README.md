@@ -1,8 +1,8 @@
-# AI Workplace Agents
+# CCAF — Curib Codex Agent Framework
 
-A universal, usage-efficient professional engineering agent framework for AI coding agents such as Codex working on **existing software projects**.
+**CCAF** is a universal, usage-efficient professional engineering agent framework for Codex and other AI coding agents working on **existing software projects**.
 
-Provide a target project and its **Planning + Requirements Analysis**. The shared agent system discovers the existing codebase, builds a technical implementation plan, implements changes, runs targeted QA and security checks, validates user-facing work from a normal user's perspective, verifies requirements, checkpoints progress, and resumes safely across sessions or usage limits.
+Provide a target project and its **Planning + Requirements Analysis**. CCAF discovers the existing codebase, builds a technical implementation plan, implements changes, runs targeted QA and security checks, validates user-facing work from a normal user's perspective, verifies requirements, checkpoints progress, and resumes safely across sessions or usage limits.
 
 ## Core workflow
 
@@ -44,7 +44,7 @@ agent/projects/<project-name>/
 
 ## Usage efficiency
 
-The framework is designed to reduce unnecessary model usage:
+CCAF is designed to reduce unnecessary model usage:
 
 - analyze deeply only when necessary,
 - persist stable architecture facts,
