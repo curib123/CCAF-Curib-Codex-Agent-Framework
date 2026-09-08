@@ -23,64 +23,17 @@ It helps your coding agent:
 
 If you are new to CCAF, this is the only section you need at first.
 
-## 1. Recommended folder setup
+## 1. CCAF now activates automatically inside this repository
 
-Put CCAF beside your existing project:
-
-```text
-workspace/
-├── AGENTS.md
-├── agent/
-└── YourProject/
-```
-
-`agent/` contains CCAF.
-
-`YourProject/` contains your actual application.
-
-The root `AGENTS.md` makes normal Codex prompts automatically follow CCAF.
-
-You can use one shared CCAF folder for multiple projects:
-
-```text
-workspace/
-├── AGENTS.md
-├── agent/
-├── ProjectA/
-├── ProjectB/
-└── ProjectC/
-```
-
----
-
-## 2. Install the Codex entrypoint
-
-Copy:
-
-```text
-agent/templates/CODEX_ROOT_AGENTS.md
-```
-
-into your workspace root and rename it:
+The repository includes a real root:
 
 ```text
 AGENTS.md
 ```
 
-Your workspace should now look like:
+That file routes normal Codex project prompts through CCAF automatically.
 
-```text
-workspace/
-├── AGENTS.md
-├── agent/
-└── YourProject/
-```
-
-This is important because it tells Codex:
-
-> Every project-work prompt should use CCAF.
-
-Even short prompts such as:
+So when CCAF itself is your workspace, prompts such as:
 
 ```text
 fix login error
@@ -102,11 +55,77 @@ update dependencies
 continue
 ```
 
-still use the CCAF workflow.
+are automatically routed through the correct CCAF workflow.
+
+No manual entrypoint copy is needed inside this repository.
 
 ---
 
-## 3. Create a project profile
+## 2. Recommended workspace setup for your own existing project
+
+Use:
+
+```text
+workspace/
+├── AGENTS.md
+├── agent/
+└── YourProject/
+```
+
+`agent/` contains CCAF.
+
+`YourProject/` contains your actual application.
+
+The root `AGENTS.md` makes ordinary Codex prompts automatically follow CCAF.
+
+You can use one shared CCAF folder for multiple projects:
+
+```text
+workspace/
+├── AGENTS.md
+├── agent/
+├── ProjectA/
+├── ProjectB/
+└── ProjectC/
+```
+
+---
+
+## 3. Easy Windows installation into another workspace
+
+From the CCAF repository, run:
+
+```powershell
+.\scripts\install-ccaf.ps1 -WorkspacePath "C:\Projects\workspace"
+```
+
+The installer:
+
+- copies/updates the shared `agent/` framework,
+- creates the root `AGENTS.md` when missing,
+- preserves an existing `AGENTS.md`,
+- appends or updates only the CCAF section when appropriate,
+- does not delete unrelated workspace files.
+
+After installation, open Codex or your editor from that workspace root.
+
+If you prefer manual setup, you can still copy:
+
+```text
+agent/templates/CODEX_ROOT_AGENTS.md
+```
+
+as:
+
+```text
+AGENTS.md
+```
+
+in the workspace root.
+
+---
+
+## 4. Create a project profile
 
 Create:
 
@@ -141,7 +160,7 @@ agent/templates/
 
 ---
 
-## 4. Put your requirements in REQUIREMENTS.md
+## 5. Put your requirements in REQUIREMENTS.md
 
 You mainly provide:
 
@@ -160,7 +179,7 @@ CCAF discovers the existing architecture and builds the implementation plan from
 
 ---
 
-## 5. Open Codex from the workspace root
+## 6. Open Codex from the workspace root
 
 Example on Windows:
 
@@ -178,32 +197,35 @@ YourProject/
 
 ---
 
-## 6. First prompt
+## 7. First project initialization prompt
 
 Use:
 
 ```text
-Read ./agent/AGENTS.md.
-
 Target project:
 ./YourProject
 
 Requirements:
 ./agent/projects/my-project/REQUIREMENTS.md
 
-Start CCAF for this existing project.
-Analyze only what is necessary, create project state, then begin the highest-priority actionable requirement.
+Initialize CCAF for this existing project and begin the highest-priority actionable requirement.
 ```
 
-After setup, you normally do **not** need this long prompt again.
+Because the root `AGENTS.md` is already active, you normally do not need to manually say `Read ./agent/AGENTS.md` every time.
 
-You can simply say:
+After initialization, ordinary prompts are enough:
 
 ```text
 continue
 ```
 
-or give a normal development request.
+```text
+fix the login error
+```
+
+```text
+add product search
+```
 
 ---
 
@@ -712,27 +734,24 @@ git push
 
 # Resume After a New Session or Usage Limit
 
-Use:
+With the root `AGENTS.md` active, a normal resume can simply be:
 
 ```text
-Read ./agent/AGENTS.md.
+continue
+```
 
+For an explicit resume request:
+
+```text
 Resume target project:
 ./YourProject
 
 Project state:
 ./agent/projects/my-project/state/
 
-Read STATUS.md and TASK.md first.
 Verify the checkpoint against current code and Git state.
 Continue from NEXT ACTION.
 Do not restart full-project analysis unless saved project facts are stale or missing.
-```
-
-In normal use, if the root `AGENTS.md` entrypoint is installed correctly, you can often simply say:
-
-```text
-continue
 ```
 
 ---
@@ -743,6 +762,8 @@ For experienced users, the core CCAF loop is:
 
 ```text
 PROMPT
+   ↓
+ROOT AGENTS.md
    ↓
 CLASSIFY INTENT
    ↓
@@ -784,14 +805,16 @@ The framework intentionally minimizes repeated analysis, parallel-agent duplicat
 # Important Files
 
 ```text
+AGENTS.md                         # Automatic root Codex entrypoint
+scripts/install-ccaf.ps1         # Safe Windows workspace installer
 agent/
-├── AGENTS.md                  # Master CCAF rules
-├── ENGINEERING_STANDARDS.md   # Coding/engineering practices
-├── EFFICIENCY_STANDARDS.md    # Context/cost/usage efficiency
-├── UX_UI_STANDARDS.md         # Modern familiar UI/UX + Jakob's Law
-├── QUALITY_GATES.md           # Completion and review gates
-├── HOW_TO_USE.md              # Detailed usage guide
-├── agents/                    # Specialist role instructions
+├── AGENTS.md                    # Master CCAF rules
+├── ENGINEERING_STANDARDS.md     # Coding/engineering practices
+├── EFFICIENCY_STANDARDS.md      # Context/cost/usage efficiency
+├── UX_UI_STANDARDS.md           # Modern familiar UI/UX + Jakob's Law
+├── QUALITY_GATES.md             # Completion and review gates
+├── HOW_TO_USE.md                # Detailed usage guide
+├── agents/                      # Specialist role instructions
 ├── workflows/
 │   ├── development-loop.md
 │   ├── bugfix.md
