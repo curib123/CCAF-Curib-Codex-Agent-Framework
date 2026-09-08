@@ -47,6 +47,13 @@ What must be true when this task is complete.
 
 Not started.
 
+## Git Checkpoint
+
+Repository:
+Branch:
+Commit:
+Sync: NOT COMMITTED | LOCAL ONLY | PUSHED
+
 ## Blockers / Notes
 
 None.
