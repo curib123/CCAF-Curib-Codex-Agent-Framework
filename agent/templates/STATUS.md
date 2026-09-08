@@ -4,12 +4,12 @@ Project:
 
 Phase:
 
-Current Task:
+Current Task ID:
 
 Last Completed:
 
 Blockers:
 
-Verification:
+Last Verification:
 
 NEXT ACTION:
