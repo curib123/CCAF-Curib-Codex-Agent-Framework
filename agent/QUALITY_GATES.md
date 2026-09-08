@@ -1,22 +1,47 @@
 # CCAF Quality Gates
 
-Use the **cheapest reliable verification** that matches task risk. Broaden only when failure, uncertainty, or risk requires it.
+Use the **cheapest reliable verification** that matches task risk. Broaden only when failure, uncertainty, dependency breadth, or risk requires it.
 
 All implementation must follow:
 
-`agent/ENGINEERING_STANDARDS.md`
+- `agent/ENGINEERING_STANDARDS.md`
+- `agent/EFFICIENCY_STANDARDS.md`
+- `agent/UX_UI_STANDARDS.md` for user-facing work
 
 Apply standards pragmatically and consistently with the target project's established architecture.
 
 ## Gate 0 — Scope and Traceability
 
-- Current `TASK.md` has one coherent objective.
+- `TASK.md` has one coherent objective.
 - Linked requirement/acceptance criteria are explicit.
 - Scope and non-scope are clear.
 - Risk and expected change surface are classified.
-- Unrelated work is not being pulled in.
+- Unrelated work is excluded.
 
-## Gate 1 — Architecture Fit
+## Gate 1 — Efficiency Profile
+
+Before implementation verify `TASK.md` declares:
+
+- Reasoning: FAST | STANDARD | DEEP
+- Context: LOCAL | CROSS-LAYER | SYSTEM
+- Test Depth: TARGETED | EXPANDED | FULL
+- External Cost: NONE | LOW | MATERIAL
+
+The selected levels must be the **minimum effective levels** for reliable completion.
+
+Escalation requires evidence such as unexpected coupling, security risk, persistent failure, or broader regression impact.
+
+## Gate 2 — Context and Usage Economy
+
+- Resume from `STATUS.md` + `TASK.md`.
+- Load only linked requirements/facts needed for the task.
+- Prefer targeted repository navigation over full rescans.
+- Reuse stable `FACTS.md` instead of rediscovering architecture.
+- Reviewers begin from task + diff + evidence.
+- No unnecessary parallel agents or duplicate analyses.
+- State files remain compact and do not contain large logs/repeated requirements.
+
+## Gate 3 — Architecture Fit
 
 - Change follows existing module/layer boundaries.
 - Existing project conventions are reused.
@@ -24,7 +49,7 @@ Apply standards pragmatically and consistently with the target project's establi
 - No parallel subsystem duplicates existing functionality.
 - Public/backward compatibility is preserved or intentionally handled.
 
-## Gate 2 — Code Quality
+## Gate 4 — Code Quality
 
 Check relevant changes for:
 
@@ -36,11 +61,11 @@ Check relevant changes for:
 - no speculative abstractions,
 - no unexplained magic values,
 - comments that explain why rather than restating code,
-- appropriate use of SOLID, DRY, KISS, and YAGNI.
+- pragmatic SOLID, DRY, KISS, and YAGNI.
 
 Do not fail work for subjective style preferences already governed by project formatting/lint rules.
 
-## Gate 3 — Correctness and Trust Boundaries
+## Gate 5 — Correctness and Trust Boundaries
 
 When relevant verify:
 
@@ -51,7 +76,7 @@ When relevant verify:
 - transactions/idempotency/concurrency are handled where needed,
 - external-provider responses are treated safely.
 
-## Gate 4 — Failure Handling
+## Gate 6 — Failure Handling
 
 For relevant failure modes verify:
 
@@ -62,7 +87,7 @@ For relevant failure modes verify:
 - user-visible errors are useful and safe,
 - logs preserve useful context without leaking secrets/private data.
 
-## Gate 5 — Focused Verification
+## Gate 7 — Focused Verification
 
 Run the smallest meaningful behavior check first:
 
@@ -73,7 +98,9 @@ Run the smallest meaningful behavior check first:
 
 Tests should verify observable behavior rather than brittle implementation details.
 
-## Gate 6 — Risk-Specific Review
+Do not rerun expensive unaffected suites without a concrete reason.
+
+## Gate 8 — Risk-Specific Review
 
 ### LOW risk
 Required:
@@ -104,21 +131,39 @@ Required:
 - verifier approval,
 - Normal User review if user-facing.
 
-## Gate 7 — User Experience and Accessibility
+## Gate 9 — UX/UI, Jakob's Law, and Accessibility
 
-For user-facing changes, when relevant verify:
+For `User-Facing: YES`, verify relevant criteria from `UX_UI_STANDARDS.md`:
 
-- loading/empty/error/success/disabled states,
-- keyboard use,
-- visible focus,
-- labels and accessible names,
-- semantic/native controls where appropriate,
-- responsive behavior,
-- error recovery,
-- familiar interaction patterns,
-- refresh/re-entry behavior.
+- page purpose and primary action are clear,
+- interaction patterns are familiar and follow Jakob's Law,
+- existing design-system components/tokens are reused,
+- loading/empty/error/success/disabled states are complete,
+- responsive behavior works for intended devices,
+- mobile/touch behavior does not depend on hover,
+- keyboard/focus/labels/semantic controls are usable,
+- dynamic behavior reflects real permissions/config/capabilities,
+- unavailable options are explained when useful,
+- visual hierarchy is modern, clean, restrained, and brand-consistent,
+- progressive disclosure prevents unnecessary complexity,
+- error recovery is clear,
+- refresh/re-entry behavior is sensible.
 
-## Gate 8 — Performance and Cost
+Do not approve a UI solely because it looks visually modern.
+
+## Gate 10 — Dynamic and Flexible Product Behavior
+
+When requirements/configuration vary at runtime:
+
+- avoid unnecessary hard-coded lists/limits/capabilities,
+- use the backend/config/source-of-truth already established by the project,
+- preserve sensible defaults,
+- keep dynamic behavior predictable,
+- do not expose internal configurability that users do not need.
+
+Flexibility must not create inconsistent UX or duplicated business authority.
+
+## Gate 11 — Performance and Cost
 
 Check for obvious regressions relevant to the change:
 
@@ -126,13 +171,36 @@ Check for obvious regressions relevant to the change:
 - unbounded list/query behavior,
 - excessive API/provider calls,
 - repeated expensive computation,
-- unnecessary rerenders or network requests,
+- unnecessary rerenders/network requests,
 - unnecessarily large payload/context,
-- duplicate paid API operations.
+- duplicate paid API operations,
+- uncontrolled retry loops,
+- unnecessary large dependencies/build cost.
 
-Measure before/after only when performance is a requirement, risk, or observed issue. Do not require micro-benchmarks for routine work.
+For AI/API/cloud features also check:
 
-## Gate 9 — Data, API, and Migration Safety
+- relevant context only,
+- bounded output/retries,
+- safe caching/batching when semantically correct,
+- lowest-cost capable automatic route when product requirements specify auto-routing,
+- manual user choices remain respected,
+- real usage/cost tracking when required.
+
+Measure before/after only when performance/cost is a requirement, risk, or observed issue.
+
+## Gate 12 — External Cost Discipline
+
+If `External Cost: MATERIAL`:
+
+- justify real paid/provider calls,
+- prefer deterministic fixtures/mocks for routine testing,
+- avoid production credentials/data,
+- prevent duplicate side effects,
+- record concise cost-sensitive evidence in `TASK.md`.
+
+Do not optimize cost by weakening required integration verification.
+
+## Gate 13 — Data, API, and Migration Safety
 
 When relevant verify:
 
@@ -143,7 +211,7 @@ When relevant verify:
 - consumers are updated for intentional breaking changes,
 - destructive behavior is explicit and protected.
 
-## Gate 10 — Configuration, Dependencies, and Documentation
+## Gate 14 — Configuration, Dependencies, and Documentation
 
 When relevant verify:
 
@@ -154,7 +222,7 @@ When relevant verify:
 - unrelated dependency upgrades are avoided,
 - setup/API/deployment docs are updated when behavior actually changed.
 
-## Gate 11 — Regression Breadth
+## Gate 15 — Regression Breadth
 
 Run broader regression when one or more are true:
 
@@ -168,19 +236,21 @@ Run broader regression when one or more are true:
 
 Do not run a full repository suite after every trivial edit unless the project is small enough that this is actually cheaper.
 
-## Gate 12 — Evidence
+## Gate 16 — Evidence and Efficiency Result
 
 Before completion, `TASK.md` must record concise evidence:
 
-- checks run,
-- outcome,
+- checks run and outcome,
 - QA/security/user-review result when required,
 - unresolved notes/risks,
-- verifier result.
+- verifier result,
+- reasoning/context/test depth actually used,
+- material external/API cost notes,
+- meaningful unnecessary work avoided when relevant.
 
 Do not paste large logs.
 
-## Gate 13 — Requirement Traceability
+## Gate 17 — Requirement Traceability
 
 A completed PLAN item must point to:
 
@@ -188,7 +258,7 @@ A completed PLAN item must point to:
 - completed task ID,
 - verification evidence.
 
-## Gate 14 — Git Integrity
+## Gate 18 — Git Integrity
 
 Before commit/push:
 
@@ -202,10 +272,10 @@ Before commit/push:
 
 Never manufacture a clean working tree with destructive commands.
 
-## Gate 15 — Checkpoint
+## Gate 19 — Checkpoint
 
 Update `STATUS.md` and `TASK.md` before moving to the next work unit.
 
-A task is not fully checkpointed until its verified result and Git sync state are accurately recorded.
+A task is not fully checkpointed until its verified result, efficiency profile/result, and Git sync state are accurately recorded.
 
-Never mark a task complete solely because code compiles, lint passes, or the UI renders.
+Never mark a task complete solely because code compiles, lint passes, the UI renders, or a commit exists.
