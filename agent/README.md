@@ -1,34 +1,50 @@
-# Universal Professional Engineering Agent System
+# CCAF — Curib Codex Agent Framework
 
-A reusable, usage-efficient agent framework for improving and completing **existing software projects**.
+A reusable, usage-efficient professional engineering framework for improving and completing **existing software projects** with Codex and other AI coding agents.
 
 You provide only:
 
-1. The target project path.
-2. Planning.
+1. the target project path,
+2. Planning,
 3. Requirements Analysis.
 
-The agent system handles:
+CCAF handles:
 
-**Analyze → Plan → Implement → Test → QA → User Validation → Review → Checkpoint → Repeat**
+**Analyze → Plan → Implement → Targeted Test → QA → Security/User Review when needed → Verify → Checkpoint → Repeat**
 
-## Design Goals
+## Why CCAF is efficient
 
-- Existing-project first.
-- Production-minded implementation.
-- Minimum necessary context and reasoning.
-- No unnecessary rewrites.
-- No fake completion.
-- Persistent checkpoints for usage/session limits.
-- Professional specialist roles.
-- Clear ownership of each engineering responsibility.
-- Urgent execution without reckless shortcuts.
+CCAF is built to minimize repeated context and unnecessary agent work:
 
-## Folder Layout
+- broad repository discovery happens only when needed,
+- stable architecture knowledge is persisted in `FACTS.md`,
+- the current work unit is persisted in a compact `TASK.md`,
+- resume sessions start from `STATUS.md` + `TASK.md`,
+- reviewers inspect task + diff + evidence first instead of re-analyzing the project,
+- LOW / MEDIUM / HIGH risk determines how much QA/review is required,
+- targeted tests run before broad suites,
+- reasoning depth escalates only when complexity requires it,
+- repeated failing approaches are bounded.
+
+## Design goals
+
+- Existing-project first
+- Production-minded implementation
+- Minimum necessary context and reasoning
+- No unnecessary rewrites
+- No fake completion
+- Risk-based quality gates
+- Persistent checkpoints for usage/session limits
+- Professional specialist roles
+- Urgent execution without reckless shortcuts
+
+## Folder layout
 
 ```text
 agent/
 ├── AGENTS.md
+├── QUALITY_GATES.md
+├── HOW_TO_USE.md
 ├── README.md
 ├── agents/
 │   ├── orchestrator.md
@@ -45,6 +61,7 @@ agent/
 ├── templates/
 │   ├── REQUIREMENTS.md
 │   ├── STATUS.md
+│   ├── TASK.md
 │   ├── PLAN.md
 │   ├── FACTS.md
 │   └── DECISIONS.md
@@ -54,57 +71,62 @@ agent/
         └── state/
 ```
 
-## How To Use
-
-Place this folder beside one or more existing projects:
+## Per-project state
 
 ```text
-workspace/
-├── agent/
-├── Vrompt/
-├── PocketPOS/
-└── AnotherProject/
-```
-
-Create a project state folder:
-
-```text
-agent/projects/vrompt/
+agent/projects/my-project/
 ├── REQUIREMENTS.md
 └── state/
     ├── STATUS.md
+    ├── TASK.md
     ├── PLAN.md
     ├── FACTS.md
     └── DECISIONS.md
 ```
 
-Paste only the approved **Planning + Requirements Analysis** into `REQUIREMENTS.md`.
+`TASK.md` is the key efficiency file. It contains only the context needed to finish the current work unit, including acceptance criteria, relevant paths, risk, required reviewers, targeted verification, evidence, and `NEXT ACTION`.
 
-Then start Codex/your coding agent with:
+## Workspace
+
+```text
+workspace/
+├── agent/
+└── YourProject/
+```
+
+One shared CCAF folder can support multiple projects.
+
+## Start
 
 ```text
 Read ./agent/AGENTS.md.
 
-Target project: ./Vrompt
-Requirements: ./agent/projects/vrompt/REQUIREMENTS.md
+Target project:
+./YourProject
 
-Start the professional existing-project development loop.
+Requirements:
+./agent/projects/my-project/REQUIREMENTS.md
+
+Start the CCAF existing-project development loop.
 Optimize for minimum usage while maintaining production-quality work.
 ```
 
-## Resume After Usage Limit / New Session
+## Resume
 
 ```text
 Read ./agent/AGENTS.md.
 
-Resume target project: ./Vrompt
-Project state: ./agent/projects/vrompt/state/
+Resume target project:
+./YourProject
 
-Do not restart completed work.
-Verify the saved checkpoint against the current code, continue from NEXT ACTION,
-and keep using the professional development loop.
+Project state:
+./agent/projects/my-project/state/
+
+Read STATUS.md and TASK.md first.
+Verify the checkpoint against the current code and diff.
+Continue from NEXT ACTION without restarting completed analysis.
 ```
 
-## Core Principle
+## Core principle
 
-**Move with urgency. Think with discipline. Verify before claiming success.**
+**Read less, but read the right things. Reuse before rewriting. Use the cheapest reliable verification. Checkpoint before context is lost.**
