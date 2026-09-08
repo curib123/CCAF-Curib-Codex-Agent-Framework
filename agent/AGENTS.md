@@ -17,7 +17,7 @@ close the gap between the current implementation and the approved requirements.
 
 Use:
 
-**Understand → Plan → Implement → Test → QA → Review → Verify → Checkpoint → Git Sync → Repeat**
+**Understand → Route → Plan → Implement → Test → QA → Review → Verify → Checkpoint → Git Sync → Repeat**
 
 The existing codebase is the implementation source of truth. `REQUIREMENTS.md` is the product source of truth.
 
@@ -29,6 +29,7 @@ All CCAF project work must follow:
 
 - `ENGINEERING_STANDARDS.md`
 - `EFFICIENCY_STANDARDS.md`
+- `MODEL_ROUTING.md`
 - `QUALITY_GATES.md`
 - `UX_UI_STANDARDS.md` for user-facing work
 
@@ -36,15 +37,57 @@ Apply standards pragmatically and consistently with the target project's establi
 
 ---
 
+# Adaptive Model & Reasoning Routing
+
+CCAF uses `MODEL_ROUTING.md`.
+
+Default mode is `AUTO` unless the user explicitly selects a model/reasoning level.
+
+Core rule:
+
+**Use the cheapest capable model tier and the lowest reasoning effort that can reliably complete the current stage. Escalate only with evidence. De-escalate as soon as the difficult work is over.**
+
+Model tiers:
+
+- **ECONOMY** — simple/local/routine work
+- **BALANCED** — normal implementation/integration/debugging
+- **PREMIUM** — security, billing, concurrency, risky migrations, difficult architecture, persistent hard bugs
+
+Reasoning levels when the host supports them:
+
+- LOW
+- MEDIUM
+- HIGH
+- XHIGH
+- MAX
+
+Do not use PREMIUM or MAX merely because they are available.
+
+A single task may use different routes by stage when the host supports switching.
+
+Example:
+
+```text
+Discovery       → ECONOMY + LOW
+Implementation  → BALANCED + MEDIUM
+Security review → PREMIUM + HIGH
+Routine tests   → ECONOMY/BALANCED + LOW/MEDIUM
+Verifier        → BALANCED + MEDIUM
+```
+
+If model/reasoning switching is unsupported by the active Codex/agent host, do not pretend it happened. Keep using the active model, record the recommended route, and still optimize context, tests, reviewers, and work-unit size.
+
+Explicit user model selection always takes priority unless unavailable or incapable of the requested operation.
+
+---
+
 # Codex Entrypoint Rule
 
-To make every Codex prompt use CCAF, place a root/project `AGENTS.md` based on:
+The repository includes a root `AGENTS.md` entrypoint. For external workspaces, use `scripts/install-ccaf.ps1` or an equivalent installation method that preserves existing workspace instructions.
 
-`agent/templates/CODEX_ROOT_AGENTS.md`
+Every project-work prompt must route through CCAF before implementation.
 
-That entrypoint must direct every project-work prompt through this file before implementation.
-
-Short prompts such as `continue`, `fix login`, `add search`, or `make responsive` still create or continue a CCAF work unit. They do not bypass state, verification, efficiency, UX, or Git discipline.
+Short prompts such as `continue`, `fix login`, `add search`, or `make responsive` still create or continue a CCAF work unit. They do not bypass state, routing, verification, efficiency, UX, or Git discipline.
 
 ---
 
@@ -76,32 +119,6 @@ Invoke only the roles needed for the current work unit.
 - **Normal User Agent** — only for user-facing behavior.
 - **Verifier** — independent requirement/evidence verification.
 
-### Default routing
-
-Normal implementation:
-
-```text
-Engineer → QA → Verifier
-```
-
-Unknown architecture:
-
-```text
-Analyst + Planner → Engineer → QA → Verifier
-```
-
-Security-sensitive:
-
-```text
-Engineer → Security → QA → Verifier
-```
-
-User-facing:
-
-```text
-Engineer → QA → Normal User → Verifier
-```
-
 Do **not** invoke every role for every task.
 
 ---
@@ -120,18 +137,21 @@ Future sessions should navigate from persisted facts instead of rediscovering th
 
 Every active work unit must be represented by `state/TASK.md`.
 
-`TASK.md` is the cheapest resume context and must contain only what is needed to finish the current unit:
+`TASK.md` is the cheapest resume context and must contain only what is needed to finish the current unit, including:
 
 - Task ID / linked requirement IDs
+- Task type
 - Objective
-- Current behavior
-- Required behavior
+- Current/required behavior
 - Scope / non-scope
 - Relevant paths
 - Acceptance criteria
 - UX/UI criteria when user-facing
 - Risk level
-- Reasoning level
+- Routing mode
+- Recommended model tier
+- Applied model / switch status
+- Reasoning effort
 - Context breadth
 - Test depth
 - External cost level
@@ -159,20 +179,25 @@ Load `PLAN.md`, `FACTS.md`, and `DECISIONS.md` only as needed.
 
 Never load the entire repository or entire requirements file just for convenience.
 
-## 4. Minimum Effective Reasoning
+## 4. Adaptive Reasoning and Model Use
 
-Use the task efficiency profile.
+Use `MODEL_ROUTING.md` and `EFFICIENCY_STANDARDS.md`.
 
-### FAST
-Use for discovery, simple edits, repetitive work, small UI changes, documentation, straightforward CRUD, and targeted test fixes.
+Start cheap and shallow when safe.
 
-### STANDARD
-Use for normal implementation, integrations, APIs, database work, debugging, and component behavior.
+Escalate only for evidence such as:
 
-### DEEP
-Use only for security, billing, concurrency, difficult architecture, risky migrations, routing/cost logic, or persistent complex bugs.
+- persistent non-trivial failures,
+- security ambiguity,
+- concurrency/race behavior,
+- migration/data-integrity risk,
+- cross-layer unknowns,
+- difficult architecture,
+- high-blast-radius decisions.
 
-Escalate only when evidence requires it. Reduce again afterward.
+Do not escalate for typos, missing dependencies, environment failures, or unrelated pre-existing test failures.
+
+After the difficult step is complete, reduce model/reasoning for routine implementation, tests, docs, and cleanup.
 
 ## 5. Diff-First Review
 
@@ -245,98 +270,30 @@ The intended result is:
 
 Do not equate modern UI with excessive cards, gradients, glass effects, animation, or unusual interaction patterns.
 
-Prefer familiar navigation, forms, dialogs, search/filter, tables, settings, loading, feedback, and destructive-action patterns.
-
-User-facing work must consider applicable:
-
-- loading,
-- empty,
-- success,
-- error,
-- disabled,
-- permission denied,
-- retry/recovery,
-- responsive/mobile,
-- keyboard/accessibility,
-- refresh/re-entry states.
-
 Dynamic UI should derive from the existing backend/configuration/capability source of truth when appropriate instead of duplicating hard-coded business rules.
-
----
-
-# Persistent Project State
-
-Each project profile maintains:
-
-```text
-agent/projects/<project>/state/
-├── STATUS.md
-├── TASK.md
-├── PLAN.md
-├── FACTS.md
-└── DECISIONS.md
-```
-
-## STATUS.md
-
-Compact execution pointer only:
-
-- Project
-- Phase
-- Current Task ID
-- Last Completed
-- Blockers
-- Last Verification
-- Git Repository
-- Git Branch
-- Git Commit
-- Git Sync
-- NEXT ACTION
-
-## TASK.md
-
-Authoritative current work-unit packet. Keep it concise and immediately executable.
-
-## PLAN.md
-
-Prioritized requirement-to-task map. Every task should link to requirement IDs where available.
-
-Statuses:
-
-- ✅ verified
-- 🔧 implemented / verification pending
-- 🚧 in progress
-- ⚠️ partial / issue found
-- ❌ missing
-- ⛔ blocked
-
-## FACTS.md
-
-Stable architecture facts only. Never use it as a diary.
-
-## DECISIONS.md
-
-Only durable architectural/product implementation decisions future sessions need.
 
 ---
 
 # Work Unit Contract
 
-Before implementation, the Orchestrator ensures `TASK.md` defines:
+Before implementation, ensure `TASK.md` defines:
 
-1. **Objective** — one coherent result.
-2. **Acceptance criteria** — observable pass/fail outcomes.
-3. **Scope** — what can change.
-4. **Non-scope** — what must not expand.
-5. **Relevant paths** — likely files/modules.
-6. **Risk** — LOW / MEDIUM / HIGH.
-7. **Reasoning** — FAST / STANDARD / DEEP.
-8. **Context** — LOCAL / CROSS-LAYER / SYSTEM.
-9. **Test depth** — TARGETED / EXPANDED / FULL.
-10. **External cost** — NONE / LOW / MATERIAL.
-11. **User-facing** — YES / NO.
-12. **Verification** — cheapest reliable test sequence.
-13. **Required roles** — only those justified by the task.
+1. Objective
+2. Acceptance criteria
+3. Scope / non-scope
+4. Relevant paths
+5. Task type
+6. Risk
+7. Routing mode
+8. Recommended model tier
+9. Applied model / switch status
+10. Reasoning effort
+11. Context breadth
+12. Test depth
+13. External cost
+14. User-facing YES/NO
+15. Verification sequence
+16. Required roles
 
 If these are clear, implement immediately. Do not keep planning.
 
@@ -350,13 +307,6 @@ Core rule:
 
 **Run the cheapest meaningful check first and broaden only when risk or evidence requires it.**
 
-Typical order:
-
-1. focused/unit test,
-2. affected integration/API/component test,
-3. relevant typecheck/lint/build,
-4. broader regression only at milestones or for high-risk changes.
-
 Compilation alone is not proof of behavior.
 
 ---
@@ -369,64 +319,22 @@ A normal completed CCAF unit must end with:
 
 **IMPLEMENTED → VERIFIED → STATE CHECKPOINTED → SAFE DIFF REVIEWED → COMMITTED → PUSHED**
 
-If push cannot be completed safely, record:
+If push cannot be completed safely, record `Git Sync: LOCAL ONLY` with the exact reason.
 
-`Git Sync: LOCAL ONLY`
-
-with the exact reason.
-
-## Commit safety
-
-Before staging:
-
-1. inspect Git status/diff,
-2. identify exactly which files belong to the task,
-3. preserve unrelated dirty work,
-4. stage only task-owned changes,
-5. inspect the staged diff,
-6. check for secrets/generated/unintended files.
-
-Do not use broad staging when unrelated changes exist.
-
-Never create a commit that silently includes pre-existing user edits.
-
-## Sync safety
-
-Before push:
-
-- know the current branch,
-- know the remote/upstream,
-- fetch remote state when appropriate,
-- never force push by default,
-- do not overwrite remote history,
-- respect existing branch/PR conventions.
-
-Record the branch, full commit SHA when available, and sync result in `STATUS.md` and `TASK.md`.
-
-Git synchronization is part of the checkpoint, not a substitute for verification.
+Never include unrelated pre-existing user edits in a CCAF commit.
 
 ---
 
 # Failure and Stall Handling
 
-Classify failures as:
-
-- new regression,
-- pre-existing failure,
-- environment failure,
-- external dependency failure.
-
-Do not fix unrelated pre-existing failures unless they block approved work.
-
-If the **same approach fails twice for the same root cause**:
+If the same approach fails twice for the same root cause:
 
 1. stop retrying it,
 2. record the failure briefly in `TASK.md`,
 3. reassess the assumption,
 4. reduce the failing unit,
-5. choose a materially different approach.
-
-If no safe path remains, mark only that task blocked and continue other actionable requirements.
+5. choose a materially different approach,
+6. escalate model/reasoning only if the failure indicates insufficient reasoning rather than environment/tooling problems.
 
 Never create an uncontrolled loop.
 
@@ -438,12 +346,14 @@ Never create an uncontrolled loop.
 
 Read:
 
-1. `AGENTS.md`
-2. project `REQUIREMENTS.md`
-3. existing repository structure
-4. Git repository/branch/remote state
+1. root `AGENTS.md`
+2. `agent/AGENTS.md`
+3. project `REQUIREMENTS.md`
+4. existing repository structure
+5. Git repository/branch/remote state
+6. available model/reasoning switching capabilities when discoverable
 
-Initialize FACTS, PLAN, STATUS, and TASK, then immediately begin the highest-priority actionable task.
+Initialize project state, then begin the highest-priority actionable task.
 
 ## Existing project state
 
@@ -461,37 +371,6 @@ Do **not** perform a fresh full-project analysis unless persisted facts are miss
 
 ---
 
-# Usage / Context Limit Safety
-
-CCAF cannot bypass platform usage limits. It must make interruption cheap.
-
-After every meaningful unit:
-
-**CODE → TARGETED EVIDENCE → VERIFY → STATE CHECKPOINT → COMMIT → SYNC**
-
-Before context becomes large, update `TASK.md` and `STATUS.md`.
-
-A new session should be able to continue from repository state plus Git history without needing the previous conversation.
-
----
-
-# Existing Work Protection
-
-Before editing, inspect Git status/diff.
-
-Never automatically use destructive operations such as:
-
-- `git reset --hard`
-- `git clean -fd`
-- broad restore/discard operations
-- force push
-
-Never erase unrelated user work.
-
-Never delete unfamiliar code without understanding it first.
-
----
-
 # Definition of Done
 
 A task is complete only when:
@@ -500,10 +379,10 @@ A task is complete only when:
 2. acceptance criteria are satisfied,
 3. required engineering/efficiency quality gates pass,
 4. no unresolved blocking QA/security issue remains,
-5. user-facing tasks satisfy relevant `UX_UI_STANDARDS.md` criteria and Normal User validation when required,
+5. user-facing tasks satisfy relevant UX/UI criteria,
 6. Verifier confirms evidence matches the requirement,
-7. TASK records the actual reasoning/context/test-depth/external-cost result,
-8. PLAN/STATUS/TASK are updated truthfully,
+7. TASK records the actual routing/model/reasoning/context/test-depth/external-cost result,
+8. project state is updated truthfully,
 9. task-owned changes are committed safely,
 10. commit is pushed to the configured GitHub upstream or explicitly recorded `LOCAL ONLY` with reason.
 
@@ -521,7 +400,11 @@ Do not mark complete because UI exists, compilation succeeds, mocks work, a comm
 
 **Read less, but read the right things.**
 
-**Use the minimum effective reasoning, context, agents, and tests.**
+**Use the cheapest capable model and lowest effective reasoning first.**
+
+**Escalate with evidence; de-escalate after the hard part.**
+
+**Use the minimum effective context, agents, and tests.**
 
 **Use the cheapest reliable verification first.**
 
