@@ -1,142 +1,373 @@
 # CCAF — Curib Codex Agent Framework
 
-**CCAF** is a reusable engineering workflow for Codex and other AI coding agents working on **existing software projects**.
+**CCAF** is a fast, cost-aware engineering workflow for Codex and other AI coding agents working on **existing software projects**.
 
-It helps your coding agent:
+It helps coding agents deliver better results with less wasted context, fewer unnecessary model calls, fewer redundant reviews, and safer Git/GitHub tracking.
 
-- understand the project before changing it,
-- avoid unnecessary rewrites and overengineering,
-- fix bugs from the root cause,
-- add features using existing project patterns,
-- perform maintenance safely,
-- follow good coding and engineering practices,
-- build modern, user-friendly UI/UX using Jakob's Law,
-- test and verify changes based on risk,
-- save progress so new sessions can resume cheaply,
-- commit verified work and keep GitHub in sync.
-
-> **Simple idea:** You tell Codex **what you want**. CCAF helps Codex decide **how to implement it safely, efficiently, and professionally**.
+> **Simple idea:** Tell Codex what you want. CCAF chooses the smallest reliable engineering path to get it done.
 
 ---
 
-# Start Here — Beginner Guide
+# What CCAF Optimizes For
 
-If you are new to CCAF, this is the only section you need at first.
+CCAF is designed for:
 
-## 1. CCAF now activates automatically inside this repository
+- fast execution,
+- strong first-pass correctness,
+- low model/context usage,
+- cost-efficient model routing,
+- minimal unnecessary testing,
+- minimal agent/reviewer overhead,
+- root-cause bug fixing,
+- clean feature development,
+- safe maintenance,
+- anti-overengineering,
+- modern user-friendly UX/UI,
+- automatic checkpoints and GitHub tracking.
 
-The repository includes a real root:
+Efficiency never means skipping security, correctness, or important verification.
+
+---
+
+# Execution Paths
+
+CCAF automatically chooses one of three paths.
+
+## FAST
+
+For small, LOW-risk, local work.
+
+Examples:
+
+- copy changes,
+- isolated styling,
+- simple bug fixes,
+- documentation,
+- routine CRUD,
+- straightforward tests.
 
 ```text
-AGENTS.md
+Engineer
+→ targeted check
+→ Verifier
+→ commit/push
 ```
 
-That file routes normal Codex project prompts through CCAF automatically.
-
-So when CCAF itself is your workspace, prompts such as:
+Default profile:
 
 ```text
-fix login error
+Model Tier: ECONOMY
+Reasoning: LOW/MEDIUM
+Context: LOCAL
+Tests: TARGETED
 ```
 
-```text
-add search
-```
+No Analyst, QA, Security, or separate Normal User pass unless the task actually needs them.
+
+---
+
+## STANDARD
+
+For normal engineering work.
+
+Examples:
+
+- features,
+- API integration,
+- database work,
+- shared UI behavior,
+- non-trivial bugs,
+- cross-layer changes.
 
 ```text
-make this responsive
+Engineer
+→ targeted/integration checks
+→ QA when useful
+→ Verifier
+→ commit/push
 ```
 
+Default profile:
+
 ```text
+Model Tier: BALANCED
+Reasoning: MEDIUM
+Context: LOCAL/CROSS-LAYER
+Tests: TARGETED/EXPANDED
+```
+
+---
+
+## GUARDED
+
+For high-risk work.
+
+Examples:
+
+- authentication,
+- authorization,
+- billing/payments,
+- credits,
+- migrations,
+- concurrency,
+- secrets,
+- destructive operations,
+- high-blast-radius changes.
+
+```text
+Engineer
+→ Security
+→ QA
+→ Verifier
+→ broader regression when justified
+→ commit/push
+```
+
+Default profile:
+
+```text
+Model Tier: PREMIUM
+Reasoning: HIGH+
+Context: CROSS-LAYER/SYSTEM
+Tests: EXPANDED/FULL when justified
+```
+
+CCAF does not use GUARDED just because more process looks safer.
+
+---
+
+# Adaptive Model + Reasoning Routing
+
+See [`agent/MODEL_ROUTING.md`](agent/MODEL_ROUTING.md).
+
+CCAF uses:
+
+```text
+ECONOMY   → simple/local/routine work
+BALANCED  → normal implementation/integration/debugging
+PREMIUM   → security, billing, concurrency, risky architecture, difficult bugs
+```
+
+Reasoning can scale through:
+
+```text
+LOW → MEDIUM → HIGH → XHIGH → MAX
+```
+
+Core rule:
+
+> **Use the cheapest capable model and lowest effective reasoning first. Escalate only with evidence. De-escalate after the hard part.**
+
+Example:
+
+```text
+Discovery       → ECONOMY + LOW
+Implementation  → BALANCED + MEDIUM
+Security review → PREMIUM + HIGH
+Routine tests   → ECONOMY/BALANCED + LOW/MEDIUM
+```
+
+If the active Codex environment cannot actually switch models/reasoning automatically, CCAF records the recommended route instead of pretending it switched.
+
+Manual user model choice always takes priority.
+
+---
+
+# Prompt Routing
+
+CCAF automatically classifies development prompts.
+
+```text
+BUGFIX      → agent/workflows/bugfix.md
+FEATURE     → agent/workflows/feature.md
+MAINTENANCE → agent/workflows/maintenance.md
+CONTINUE    → agent/workflows/resume.md
+GENERAL     → agent/workflows/development-loop.md
+```
+
+Examples:
+
+```text
+fix this login error
+add product search
 update dependencies
-```
-
-```text
+make this responsive
 continue
 ```
 
-are automatically routed through the correct CCAF workflow.
-
-No manual entrypoint copy is needed inside this repository.
+All route through CCAF automatically when the root `AGENTS.md` is active.
 
 ---
 
-## 2. Recommended workspace setup for your own existing project
+# Fast Bug Fixes
 
-Use:
-
-```text
-workspace/
-├── AGENTS.md
-├── agent/
-└── YourProject/
-```
-
-`agent/` contains CCAF.
-
-`YourProject/` contains your actual application.
-
-The root `AGENTS.md` makes ordinary Codex prompts automatically follow CCAF.
-
-You can use one shared CCAF folder for multiple projects:
+Bug fixing follows:
 
 ```text
-workspace/
-├── AGENTS.md
-├── agent/
-├── ProjectA/
-├── ProjectB/
-└── ProjectC/
+Confirm failure
+→ identify root cause
+→ smallest safe fix
+→ targeted regression check
+→ verify
+→ commit/push
 ```
+
+CCAF avoids broad rewrites and does not fix unrelated issues unless they block the task or expose critical security/data risk.
 
 ---
 
-## 3. Easy Windows installation into another workspace
+# Efficient Feature Development
 
-From the CCAF repository, run:
-
-```powershell
-.\scripts\install-ccaf.ps1 -WorkspacePath "C:\Projects\workspace"
-```
-
-The installer:
-
-- copies/updates the shared `agent/` framework,
-- creates the root `AGENTS.md` when missing,
-- preserves an existing `AGENTS.md`,
-- appends or updates only the CCAF section when appropriate,
-- does not delete unrelated workspace files.
-
-After installation, open Codex or your editor from that workspace root.
-
-If you prefer manual setup, you can still copy:
+Feature work follows:
 
 ```text
-agent/templates/CODEX_ROOT_AGENTS.md
+Understand requested outcome
+→ inspect existing patterns
+→ define smallest coherent vertical slice
+→ implement
+→ targeted verification
+→ user/security review only if needed
+→ verify
+→ commit/push
 ```
 
-as:
-
-```text
-AGENTS.md
-```
-
-in the workspace root.
+CCAF reuses existing components, services, APIs, database patterns, and architecture before creating anything new.
 
 ---
 
-## 4. Create a project profile
+# Safe Maintenance
 
-Create:
+Maintenance follows:
 
 ```text
-agent/projects/my-project/
+Define maintenance scope
+→ assess impact
+→ make minimum safe change
+→ targeted regression
+→ verify
+→ commit/push
 ```
 
-with:
+It is designed to avoid maintenance turning into an accidental redesign.
+
+---
+
+# Anti-Overengineering
+
+CCAF follows:
+
+- **KISS** — keep solutions simple,
+- **YAGNI** — do not build hypothetical future needs,
+- **DRY** — avoid meaningful duplicated business logic,
+- **SOLID** — apply only when it improves maintainability/testability.
+
+Before adding a new abstraction, framework, service, queue, cache, plugin system, database, dependency, or architecture layer, there must be a concrete need.
+
+> **Small problem → small solution.**
+
+---
+
+# Minimum Context Strategy
+
+CCAF resumes from:
 
 ```text
-agent/projects/my-project/
+STATUS.md
+→ TASK.md
+→ Git diff/status
+→ linked requirement
+→ exact relevant source/test files
+```
+
+It expands outward only when needed:
+
+```text
+symbol/file
+→ direct dependency
+→ module
+→ cross-layer boundary
+→ system-wide only if required
+```
+
+Stable project knowledge is persisted in `FACTS.md` so Codex does not repeatedly rediscover the repository.
+
+---
+
+# Single-Pass Default
+
+CCAF prefers one strong execution cycle:
+
+```text
+understand → edit → test → diff review → verify
+```
+
+A second pass happens only when:
+
+- tests fail,
+- acceptance criteria are not met,
+- review finds a material problem,
+- risk/scope changes,
+- a key assumption is wrong.
+
+This reduces repeated planning and unnecessary model usage.
+
+---
+
+# Stop-When-Sufficient Testing
+
+CCAF starts with the cheapest meaningful test.
+
+```text
+focused test
+→ affected integration/component/API check
+→ relevant typecheck/lint/build
+→ expanded regression only when justified
+→ full suite at milestones/releases or high risk
+```
+
+Testing stops when:
+
+- acceptance criteria are proven,
+- affected boundaries are covered,
+- risk is adequately addressed,
+- no evidence suggests broader regression.
+
+---
+
+# Modern UX/UI
+
+See [`agent/UX_UI_STANDARDS.md`](agent/UX_UI_STANDARDS.md).
+
+CCAF targets:
+
+**modern + familiar + accessible + responsive + flexible**
+
+It follows **Jakob's Law** and prefers familiar navigation, forms, dialogs, tables, settings, search/filter behavior, and mobile patterns.
+
+Meaningful user-facing work considers:
+
+- loading,
+- empty,
+- success,
+- error,
+- disabled,
+- permission states,
+- responsive behavior,
+- accessibility,
+- keyboard/focus behavior,
+- refresh/re-entry,
+- clear recovery paths.
+
+Tiny copy/spacing/color fixes do not trigger a full UX audit.
+
+---
+
+# Project State
+
+Each project profile uses:
+
+```text
+agent/projects/<project>/
 ├── REQUIREMENTS.md
 └── state/
     ├── STATUS.md
@@ -146,60 +377,56 @@ agent/projects/my-project/
     └── DECISIONS.md
 ```
 
-You can copy the files from:
+Purpose:
 
-```text
-agent/projects/_example/
-```
+- `STATUS.md` → where are we?
+- `TASK.md` → what should happen next?
+- `PLAN.md` → what work remains?
+- `FACTS.md` → what stable project knowledge should not be rediscovered?
+- `DECISIONS.md` → what durable technical decisions matter later?
 
-or use the templates inside:
-
-```text
-agent/templates/
-```
+FAST tasks keep state extremely compact.
 
 ---
 
-## 5. Put your requirements in REQUIREMENTS.md
+# Git + GitHub Tracking
 
-You mainly provide:
+See [`agent/workflows/github-sync.md`](agent/workflows/github-sync.md).
 
-- what problem you are solving,
-- goals,
-- scope,
-- features,
-- security requirements,
-- performance/reliability needs,
-- usability expectations,
-- acceptance criteria.
+Verified work follows:
 
-You do **not** need to manually create the full technical implementation plan.
+```text
+inspect diff
+→ stage only task-owned changes
+→ review staged diff
+→ commit
+→ push
+→ record branch + commit SHA + sync state
+```
 
-CCAF discovers the existing architecture and builds the implementation plan from the real project.
+CCAF does not blindly use `git add .` when unrelated work exists.
+
+If push fails safely:
+
+```text
+Git Sync: LOCAL ONLY
+```
+
+with the exact reason.
 
 ---
 
-## 6. Open Codex from the workspace root
+# Quick Start
 
-Example on Windows:
+This repository already includes a root `AGENTS.md`.
+
+For another Windows workspace:
 
 ```powershell
-cd C:\Projects\workspace
-code .
+.\scripts\install-ccaf.ps1 -WorkspacePath "C:\Projects\workspace"
 ```
 
-Codex should be able to see both:
-
-```text
-agent/
-YourProject/
-```
-
----
-
-## 7. First project initialization prompt
-
-Use:
+Then initialize a project:
 
 ```text
 Target project:
@@ -208,687 +435,68 @@ Target project:
 Requirements:
 ./agent/projects/my-project/REQUIREMENTS.md
 
-Initialize CCAF for this existing project and begin the highest-priority actionable requirement.
+Initialize CCAF and begin the highest-priority actionable requirement.
 ```
-
-Because the root `AGENTS.md` is already active, you normally do not need to manually say `Read ./agent/AGENTS.md` every time.
 
 After initialization, ordinary prompts are enough:
 
 ```text
 continue
+fix the login bug
+add search
+update dependencies
 ```
-
-```text
-fix the login error
-```
-
-```text
-add product search
-```
-
----
-
-# What Happens When You Send a Prompt?
-
-CCAF first identifies the type of work.
-
-## Bug or error
-
-Example:
-
-```text
-fix the login error when the token expires
-```
-
-CCAF uses the **BUGFIX** workflow:
-
-```text
-Confirm failure
-→ Find root cause
-→ Define expected behavior
-→ Add/identify regression check
-→ Make smallest safe fix
-→ Test nearby behavior
-→ Verify
-→ Commit
-→ Push
-```
-
-CCAF tries to fix the **cause**, not only hide the symptom.
-
-See [`agent/workflows/bugfix.md`](agent/workflows/bugfix.md).
-
----
-
-## New feature
-
-Example:
-
-```text
-add product search with filters
-```
-
-CCAF uses the **FEATURE** workflow:
-
-```text
-Understand requested outcome
-→ Inspect existing project patterns
-→ Define smallest vertical slice
-→ Implement
-→ Test
-→ Validate UX/security when relevant
-→ Verify
-→ Commit
-→ Push
-```
-
-CCAF reuses existing components, APIs, database patterns, and architecture whenever possible.
-
-See [`agent/workflows/feature.md`](agent/workflows/feature.md).
-
----
-
-## Maintenance
-
-Example:
-
-```text
-update dependencies and remove deprecated code
-```
-
-CCAF uses the **MAINTENANCE** workflow:
-
-```text
-Define maintenance scope
-→ Check impact
-→ Make minimum safe change
-→ Run targeted regression
-→ Verify
-→ Commit
-→ Push
-```
-
-Maintenance should improve the project without becoming an accidental rewrite.
-
-See [`agent/workflows/maintenance.md`](agent/workflows/maintenance.md).
-
----
-
-## Continue existing work
-
-Example:
-
-```text
-continue
-```
-
-CCAF resumes from:
-
-```text
-STATUS.md
-→ TASK.md
-→ Git diff / branch state
-→ relevant requirement/files only
-→ NEXT ACTION
-```
-
-It should not restart the entire project analysis.
-
----
-
-# Why CCAF Uses Project State
-
-CCAF saves useful context inside the repository instead of depending on conversation memory.
-
-## STATUS.md
-
-Answers:
-
-> Where are we now?
-
-Contains things such as:
-
-- current task,
-- last completed work,
-- blockers,
-- last verification,
-- Git branch/commit/sync status,
-- NEXT ACTION.
-
-## TASK.md
-
-Answers:
-
-> What exactly should Codex work on right now?
-
-It is the main low-context resume packet.
-
-## PLAN.md
-
-Answers:
-
-> What remains to be implemented?
-
-Tasks should link back to requirement IDs.
-
-## FACTS.md
-
-Answers:
-
-> What stable things have already been discovered about the project?
-
-Examples:
-
-- framework,
-- database,
-- authentication mechanism,
-- important directories,
-- build/test commands.
-
-This prevents Codex from rediscovering the same architecture every session.
-
-## DECISIONS.md
-
-Answers:
-
-> Which important technical decisions must future sessions remember?
-
-It is not a development diary.
-
----
-
-# CCAF Is Designed to Avoid Overengineering
-
-CCAF follows a strong rule:
-
-> **Use the simplest production-quality solution that satisfies the real requirement and fits the existing project.**
-
-CCAF should **not** add extra architecture just because it looks sophisticated.
-
-Before adding things such as:
-
-- new abstraction layers,
-- repositories,
-- factories,
-- interfaces,
-- queues,
-- caches,
-- event buses,
-- plugin systems,
-- microservices,
-- new frameworks,
-- new databases,
-- large dependencies,
-
-there must be a concrete need.
-
-CCAF follows:
-
-- **KISS** — keep it simple,
-- **YAGNI** — do not build hypothetical future features,
-- **DRY** — avoid meaningful duplicated business logic,
-- **SOLID** — apply when it actually improves maintainability/testing.
-
-Small problem → small solution.
-
-Complex architecture is justified only by real complexity.
-
----
-
-# Modern UI/UX Rules
-
-For user-facing work, CCAF follows [`agent/UX_UI_STANDARDS.md`](agent/UX_UI_STANDARDS.md).
-
-The goal is:
-
-**modern + familiar + accessible + responsive + flexible**
-
-rather than visually impressive but confusing UI.
-
-## Jakob's Law
-
-Users spend most of their time using other products.
-
-CCAF therefore prefers familiar patterns such as:
-
-- recognizable navigation,
-- standard form behavior,
-- predictable buttons,
-- conventional dialogs,
-- familiar tables/lists,
-- clear settings pages,
-- expected mobile behavior.
-
-> **Modern should still feel familiar.**
-
-## User-facing work should consider
-
-- loading states,
-- empty states,
-- success states,
-- error states,
-- disabled states,
-- permission states,
-- responsive layouts,
-- keyboard navigation,
-- focus states,
-- accessibility,
-- recovery after mistakes,
-- refresh/re-entry behavior.
-
-CCAF also uses a **Normal User Agent** for user-facing work when appropriate.
-
----
-
-# Efficient and Cost-Aware by Design
-
-See [`agent/EFFICIENCY_STANDARDS.md`](agent/EFFICIENCY_STANDARDS.md).
-
-Every task can declare:
-
-```text
-Reasoning: FAST | STANDARD | DEEP
-Context: LOCAL | CROSS-LAYER | SYSTEM
-Test Depth: TARGETED | EXPANDED | FULL
-External Cost: NONE | LOW | MATERIAL
-User-Facing: YES | NO
-```
-
-CCAF starts with the minimum effective level and escalates only when needed.
-
-## Example
-
-Small CSS issue:
-
-```text
-Reasoning: FAST
-Context: LOCAL
-Test Depth: TARGETED
-External Cost: NONE
-```
-
-Authentication bug:
-
-```text
-Reasoning: DEEP
-Context: CROSS-LAYER
-Test Depth: EXPANDED
-External Cost: NONE
-```
-
-CCAF tries to reduce waste from:
-
-- repeated repository scans,
-- unnecessary high reasoning,
-- too many agent calls,
-- repeated external API calls,
-- excessive CI runs,
-- full test suites after trivial changes,
-- huge context windows containing irrelevant files.
-
-Efficiency never means skipping important security or correctness checks.
-
----
-
-# Risk-Based Reviews
-
-CCAF does not run every specialist on every task.
-
-## LOW risk
-
-Examples:
-
-- copy changes,
-- isolated styling,
-- documentation,
-- simple non-sensitive edits.
-
-```text
-Engineer
-→ focused verification
-→ Verifier
-```
-
-## MEDIUM risk
-
-Examples:
-
-- ordinary features,
-- APIs,
-- shared UI behavior,
-- normal database logic.
-
-```text
-Engineer
-→ QA
-→ Verifier
-```
-
-Add Normal User Agent for user-facing changes.
-
-## HIGH risk
-
-Examples:
-
-- authentication,
-- authorization,
-- payments,
-- billing/credits,
-- permissions,
-- migrations,
-- concurrency,
-- destructive data operations,
-- secrets.
-
-```text
-Engineer
-→ Security Reviewer
-→ QA
-→ Verifier
-```
-
-Add Normal User Agent when the behavior is user-facing.
-
----
-
-# Professional Roles
-
-CCAF uses specialized roles only when they are useful.
-
-### Orchestrator
-
-Selects the right task, risk, workflow, reviewers, and checkpoint strategy.
-
-### Analyst + Planner
-
-Discovers the existing architecture, compares it with requirements, and creates a requirement-linked plan.
-
-### Engineer
-
-Implements the smallest correct production-quality change using the project's real stack and conventions.
-
-### QA Engineer
-
-Tests expected behavior, failure paths, edge cases, and regressions.
-
-### Security Reviewer
-
-Reviews security-sensitive work such as authentication, authorization, billing, permissions, uploads, secrets, and user data.
-
-### Normal User Agent
-
-Evaluates user-facing work from the perspective of a normal user rather than an engineer.
-
-### Verifier
-
-Independently checks that the implementation, evidence, and acceptance criteria actually match.
-
----
-
-# Coding and Engineering Standards
-
-See [`agent/ENGINEERING_STANDARDS.md`](agent/ENGINEERING_STANDARDS.md).
-
-CCAF expects production-minded practices such as:
-
-- readable code,
-- clear naming,
-- cohesive responsibilities,
-- validation at trust boundaries,
-- secure defaults,
-- explicit error handling,
-- data integrity,
-- compatibility awareness,
-- focused tests,
-- observability where needed,
-- dependency discipline,
-- safe migrations,
-- performance awareness,
-- cost awareness,
-- maintainable Git history.
-
-The framework values good engineering judgment over blindly following patterns.
-
----
-
-# Quality Gates
-
-See [`agent/QUALITY_GATES.md`](agent/QUALITY_GATES.md).
-
-Depending on the task, CCAF checks:
-
-```text
-Scope
-→ Efficiency profile
-→ Architecture fit
-→ Code quality
-→ Correctness
-→ Failure handling
-→ Targeted testing
-→ Risk review
-→ UX / Jakob's Law
-→ Accessibility
-→ Dynamic/flexible behavior
-→ Performance / cost
-→ API/data safety
-→ Dependencies/configuration
-→ Regression
-→ Evidence
-→ Requirement traceability
-→ Git integrity
-→ Checkpoint
-```
-
-Not every gate requires an expensive test. The depth should match the task risk.
-
----
-
-# Git and GitHub Tracking
-
-CCAF includes a Git/GitHub checkpoint workflow:
-
-[`agent/workflows/github-sync.md`](agent/workflows/github-sync.md)
-
-After a verified work unit, CCAF should:
-
-```text
-Inspect diff
-→ stage task-owned files only
-→ review staged diff
-→ commit
-→ push
-→ record branch + commit SHA + sync state
-```
-
-Example commit:
-
-```text
-fix(auth): handle expired sessions [P0-03]
-```
-
-CCAF should **not** blindly use `git add .` when unrelated changes exist.
-
-It must preserve unrelated local user work.
-
-If push cannot succeed safely, state should record:
-
-```text
-Git Sync: LOCAL ONLY
-```
-
-with the reason.
-
-Your local environment must still have valid GitHub authentication and a configured remote.
-
-Useful checks:
-
-```powershell
-git remote -v
-git branch --show-current
-git status
-git push
-```
-
----
-
-# Resume After a New Session or Usage Limit
-
-With the root `AGENTS.md` active, a normal resume can simply be:
-
-```text
-continue
-```
-
-For an explicit resume request:
-
-```text
-Resume target project:
-./YourProject
-
-Project state:
-./agent/projects/my-project/state/
-
-Verify the checkpoint against current code and Git state.
-Continue from NEXT ACTION.
-Do not restart full-project analysis unless saved project facts are stale or missing.
-```
-
----
-
-# Advanced: Core Execution Model
-
-For experienced users, the core CCAF loop is:
-
-```text
-PROMPT
-   ↓
-ROOT AGENTS.md
-   ↓
-CLASSIFY INTENT
-   ↓
-LOAD STATUS + TASK
-   ↓
-LOAD MINIMUM RELEVANT CONTEXT
-   ↓
-SELECT RISK + EFFICIENCY PROFILE
-   ↓
-IMPLEMENT SMALLEST COMPLETE CHANGE
-   ↓
-CHEAPEST RELIABLE TEST
-   ↓
-RISK-BASED REVIEW
-   ↓
-INDEPENDENT VERIFICATION
-   ↓
-UPDATE STATE
-   ↓
-SAFE COMMIT + GITHUB SYNC
-   ↓
-NEXT TASK
-```
-
-Intent routing:
-
-```text
-BUGFIX      → workflows/bugfix.md
-FEATURE     → workflows/feature.md
-MAINTENANCE → workflows/maintenance.md
-CONTINUE    → workflows/resume.md
-GENERAL     → workflows/development-loop.md
-```
-
-The framework intentionally minimizes repeated analysis, parallel-agent duplication, unnecessary abstractions, and expensive full regression runs.
 
 ---
 
 # Important Files
 
 ```text
-AGENTS.md                         # Automatic root Codex entrypoint
-scripts/install-ccaf.ps1         # Safe Windows workspace installer
+AGENTS.md                         # Root Codex entrypoint
+scripts/install-ccaf.ps1         # Windows workspace installer
 agent/
-├── AGENTS.md                    # Master CCAF rules
+├── AGENTS.md                    # Master execution rules
+├── MODEL_ROUTING.md             # Adaptive model/reasoning routing
+├── EFFICIENCY_STANDARDS.md      # Speed, context, cost, usage controls
 ├── ENGINEERING_STANDARDS.md     # Coding/engineering practices
-├── EFFICIENCY_STANDARDS.md      # Context/cost/usage efficiency
-├── UX_UI_STANDARDS.md           # Modern familiar UI/UX + Jakob's Law
-├── QUALITY_GATES.md             # Completion and review gates
-├── HOW_TO_USE.md                # Detailed usage guide
-├── agents/                      # Specialist role instructions
+├── UX_UI_STANDARDS.md           # Modern UX + Jakob's Law
+├── QUALITY_GATES.md             # Adaptive verification gates
+├── HOW_TO_USE.md                # Detailed guide
+├── agents/
 ├── workflows/
-│   ├── development-loop.md
-│   ├── bugfix.md
-│   ├── feature.md
-│   ├── maintenance.md
-│   ├── milestone-review.md
-│   ├── github-sync.md
-│   ├── start.md
-│   └── resume.md
 ├── templates/
-│   ├── CODEX_ROOT_AGENTS.md
-│   ├── REQUIREMENTS.md
-│   ├── STATUS.md
-│   ├── TASK.md
-│   ├── PLAN.md
-│   ├── FACTS.md
-│   └── DECISIONS.md
 └── projects/
-    └── _example/
 ```
 
 ---
 
-# CCAF Principles
+# Core Principles
 
-**Understand before editing.**
+**Correctness before optimization.**
+
+**First-pass correctness beats repeated rework.**
+
+**Use FAST PATH whenever safely possible.**
 
 **Reuse before rewriting.**
 
-**Fix root causes, not only symptoms.**
+**Small problem → small solution.**
 
-**Small requirement → small implementation.**
+**Read less, but read the right things.**
 
-**Do not overengineer.**
+**Use the cheapest capable model first.**
 
-**Use the minimum effective reasoning and context.**
+**Use the lowest effective reasoning first.**
 
-**Run the cheapest reliable verification first.**
+**Escalate with evidence and de-escalate afterward.**
 
-**Modern UI should still feel familiar.**
+**Use the minimum effective context, agents, and tests.**
 
-**Follow Jakob's Law for user-facing experiences.**
+**Stop verification when evidence is sufficient.**
 
-**Protect existing user work.**
-
-**Checkpoint before context is lost.**
-
-**Commit only what the task owns.**
+**Do not overengineer the project or the framework.**
 
 **Keep verified work tracked in GitHub.**
-
----
-
-# Detailed Documentation
-
-For the complete setup and operating guide, see:
-
-[`agent/HOW_TO_USE.md`](agent/HOW_TO_USE.md)
-
-For coding practices:
-
-[`agent/ENGINEERING_STANDARDS.md`](agent/ENGINEERING_STANDARDS.md)
-
-For efficiency:
-
-[`agent/EFFICIENCY_STANDARDS.md`](agent/EFFICIENCY_STANDARDS.md)
-
-For UX/UI:
-
-[`agent/UX_UI_STANDARDS.md`](agent/UX_UI_STANDARDS.md)
-
-For quality verification:
-
-[`agent/QUALITY_GATES.md`](agent/QUALITY_GATES.md)
 
 ---
 
