@@ -1,111 +1,162 @@
-# Professional Development Loop
+# CCAF Professional Development Loop
 
-## Loop
+## Primary Loop
 
 ```text
-LOAD REQUIREMENTS
+LOAD STATUS + TASK
       ↓
-LOAD SAVED PROJECT STATE
+VERIFY CHECKPOINT AGAINST CODE
       ↓
-ANALYZE ONLY WHAT IS UNKNOWN
+LOAD ONLY NEEDED REQUIREMENT / FACTS
       ↓
-SELECT HIGHEST-PRIORITY GAP
+SELECT OR CONFIRM CURRENT GAP
+      ↓
+CLASSIFY RISK
       ↓
 IMPLEMENT SMALLEST COMPLETE CHANGE
       ↓
-TARGETED TEST
+RUN CHEAPEST MEANINGFUL TEST
       ↓
-QA
-      ↓
-SECURITY REVIEW IF NEEDED
-      ↓
-NORMAL USER CHECK IF USER-FACING
+QA / SECURITY / NORMAL USER AS REQUIRED
       ↓
 VERIFIER
       ↓
-CHECKPOINT
+CHECKPOINT TASK + STATUS + PLAN
       ↓
 NEXT TASK
 ```
 
-## Step 1 — Load
+## Step 1 — Resume Cheaply
 
-Read:
+Read in this order:
 
-- `REQUIREMENTS.md`
-- `state/STATUS.md`
-- relevant `state/PLAN.md`
-- relevant `state/FACTS.md`
+1. `state/STATUS.md`
+2. `state/TASK.md`
+3. current Git status/diff
+4. relevant requirement section
+5. only relevant `FACTS.md` / `DECISIONS.md`
 
-Read `DECISIONS.md` only when relevant.
+Do not start with a broad repository scan when valid state exists.
 
-Inspect Git status/diff.
+## Step 2 — Validate the Task Packet
 
-## Step 2 — Analyze
+`TASK.md` must contain:
 
-If architecture needed for the task is already known, do not re-run a broad analysis.
+- task ID,
+- requirement link,
+- objective,
+- current vs required behavior,
+- scope/non-scope,
+- relevant paths,
+- acceptance criteria,
+- risk level,
+- required reviewers,
+- targeted verification,
+- next action.
 
-If unknown, Analyst + Planner inspects only the necessary area and updates facts.
+If it is already sufficient, implement immediately.
 
-## Step 3 — Select
+If not, Analyst + Planner fills only the missing knowledge.
 
-Choose the highest-priority actionable gap.
+## Step 3 — Risk Classify
 
-Do not jump randomly between tasks.
+### LOW
+Isolated, reversible, non-sensitive work.
+
+Typical route:
+
+`Engineer → focused verification → Verifier`
+
+### MEDIUM
+Normal product/data/integration behavior.
+
+Typical route:
+
+`Engineer → QA → Verifier`
+
+Add Normal User if user-facing.
+
+### HIGH
+Auth, permissions, payments, credits, migrations, secrets, destructive operations, concurrency, sensitive data.
+
+Typical route:
+
+`Engineer → Security → QA → Verifier`
+
+Add Normal User if user-facing.
 
 ## Step 4 — Implement
 
-Engineer performs the smallest coherent implementation.
+Engineer changes the smallest coherent unit that can satisfy the current acceptance criteria.
 
-## Step 5 — Test
+Do not combine unrelated backlog items merely because nearby files are open.
 
-Run targeted checks first.
+## Step 5 — Targeted Verification
 
-## Step 6 — QA
+Use `../QUALITY_GATES.md`.
 
-QA Engineer tries happy path + realistic failure/edge paths.
+Run the cheapest meaningful check first.
 
-## Step 7 — Security
+Broaden only when:
 
-Only if the task is security-sensitive.
+- risk requires it,
+- focused checks fail,
+- behavior crosses boundaries,
+- milestone/final regression is due.
 
-## Step 8 — Normal User
+## Step 6 — Diff-First Review
 
-Only if user-facing behavior changed.
+QA, Security, Normal User, and Verifier begin from:
 
-## Step 9 — Verify
+- `TASK.md`,
+- changed files/diff,
+- focused test evidence.
 
-Verifier checks code + requirement + evidence.
+They should not perform independent full-project rediscovery unless a material unknown is exposed.
 
-## Step 10 — Checkpoint
+## Step 7 — Failure Handling
 
-Update:
+Classify failure:
 
-- `STATUS.md`
-- `PLAN.md`
-- `FACTS.md` only if stable facts changed
-- `DECISIONS.md` only if important decisions were made
-
-## Step 11 — Repeat
-
-Continue while actionable required work remains.
-
-## Stop Conditions
-
-Stop only for:
-
-- all requirements verified,
-- genuine hard blocker,
-- platform/session/usage interruption.
-
-Before interruption, leave an exact `NEXT ACTION`.
-
-## Stall Protection
+- new regression,
+- pre-existing failure,
+- environment failure,
+- external dependency failure.
 
 If the same approach fails twice for the same root cause:
 
-- stop repeating,
-- diagnose,
-- reduce scope,
-- change approach,
-- document blocker if unresolved.
+1. stop repeating it,
+2. update `TASK.md` with the failure,
+3. reassess assumptions,
+4. reduce the failing unit,
+5. choose a materially different approach.
+
+Do not create endless retry loops.
+
+## Step 8 — Checkpoint
+
+After every meaningful work unit update:
+
+- `TASK.md` — exact current result/evidence/next action,
+- `STATUS.md` — compact pointer,
+- `PLAN.md` — task status and requirement traceability,
+- `FACTS.md` — only if stable project facts changed,
+- `DECISIONS.md` — only if a durable decision was made.
+
+## Step 9 — Continue
+
+Continue while approved actionable requirements remain.
+
+Stop only when:
+
+- requirements are verified,
+- the remaining work is genuinely blocked,
+- the platform/session/usage limit interrupts execution.
+
+Before interruption, leave an exact `NEXT ACTION` in both `TASK.md` and `STATUS.md`.
+
+## Context Budget Rule
+
+If active context becomes large, checkpoint first, then resume from files rather than carrying historical discussion forward.
+
+The repository state must be sufficient for a fresh agent session to continue.
