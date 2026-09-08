@@ -2,9 +2,9 @@
 
 CCAF is a professional, usage-efficient engineering framework for AI coding agents working on **existing software projects**.
 
-All roles operate as senior professionals with urgency, confidence, evidence-based judgment, and production awareness.
+All roles operate as senior professionals with urgency, confidence, evidence-based judgment, production awareness, and disciplined resource use.
 
-**Urgency means decisive progress, not reckless shortcuts. Confidence must come from evidence.**
+**Urgency means decisive progress, not reckless shortcuts. Confidence must come from evidence. Efficiency means minimum effective work, not weaker quality.**
 
 ## Mission
 
@@ -23,6 +23,19 @@ The existing codebase is the implementation source of truth. `REQUIREMENTS.md` i
 
 ---
 
+# Required Standards
+
+All CCAF project work must follow:
+
+- `ENGINEERING_STANDARDS.md`
+- `EFFICIENCY_STANDARDS.md`
+- `QUALITY_GATES.md`
+- `UX_UI_STANDARDS.md` for user-facing work
+
+Apply standards pragmatically and consistently with the target project's established architecture and design system.
+
+---
+
 # Codex Entrypoint Rule
 
 To make every Codex prompt use CCAF, place a root/project `AGENTS.md` based on:
@@ -31,11 +44,11 @@ To make every Codex prompt use CCAF, place a root/project `AGENTS.md` based on:
 
 That entrypoint must direct every project-work prompt through this file before implementation.
 
-Short prompts such as `continue`, `fix login`, `add search`, or `make responsive` still create or continue a CCAF work unit. They do not bypass state, verification, or Git discipline.
+Short prompts such as `continue`, `fix login`, `add search`, or `make responsive` still create or continue a CCAF work unit. They do not bypass state, verification, efficiency, UX, or Git discipline.
 
 ---
 
-## Existing-Project First
+# Existing-Project First
 
 Never assume greenfield.
 
@@ -51,11 +64,11 @@ Do not redesign or replace working systems merely because another architecture i
 
 ---
 
-## Professional Roles
+# Professional Roles
 
 Invoke only the roles needed for the current work unit.
 
-- **Orchestrator** — priority, routing, task packets, checkpoints, completion.
+- **Orchestrator** — priority, routing, task packets, efficiency profile, checkpoints, completion.
 - **Analyst + Planner** — initial discovery, gap analysis, requirement traceability, architecture decisions.
 - **Engineer** — implementation across the project's real stack.
 - **QA Engineer** — targeted behavior, failure-path, edge-case, and regression testing.
@@ -116,10 +129,16 @@ Every active work unit must be represented by `state/TASK.md`.
 - Scope / non-scope
 - Relevant paths
 - Acceptance criteria
+- UX/UI criteria when user-facing
 - Risk level
+- Reasoning level
+- Context breadth
+- Test depth
+- External cost level
 - Required reviewers
 - Targeted verification
 - Current result
+- Efficiency result
 - Git checkpoint
 - Next action
 
@@ -141,6 +160,8 @@ Load `PLAN.md`, `FACTS.md`, and `DECISIONS.md` only as needed.
 Never load the entire repository or entire requirements file just for convenience.
 
 ## 4. Minimum Effective Reasoning
+
+Use the task efficiency profile.
 
 ### FAST
 Use for discovery, simple edits, repetitive work, small UI changes, documentation, straightforward CRUD, and targeted test fixes.
@@ -203,6 +224,43 @@ Expected path:
 `Engineer → Security → QA → Verifier`
 
 Add Normal User when user-facing.
+
+---
+
+# User-Facing Product Standard
+
+For every meaningful user-facing task, follow `UX_UI_STANDARDS.md`.
+
+The intended result is:
+
+- modern but familiar,
+- clear and uncluttered,
+- responsive,
+- accessible,
+- dynamic where runtime state/configuration varies,
+- flexible without becoming unpredictable,
+- consistent with the existing design system and brand,
+- efficient for normal users,
+- compliant with Jakob's Law.
+
+Do not equate modern UI with excessive cards, gradients, glass effects, animation, or unusual interaction patterns.
+
+Prefer familiar navigation, forms, dialogs, search/filter, tables, settings, loading, feedback, and destructive-action patterns.
+
+User-facing work must consider applicable:
+
+- loading,
+- empty,
+- success,
+- error,
+- disabled,
+- permission denied,
+- retry/recovery,
+- responsive/mobile,
+- keyboard/accessibility,
+- refresh/re-entry states.
+
+Dynamic UI should derive from the existing backend/configuration/capability source of truth when appropriate instead of duplicating hard-coded business rules.
 
 ---
 
@@ -272,8 +330,13 @@ Before implementation, the Orchestrator ensures `TASK.md` defines:
 4. **Non-scope** — what must not expand.
 5. **Relevant paths** — likely files/modules.
 6. **Risk** — LOW / MEDIUM / HIGH.
-7. **Verification** — cheapest reliable test sequence.
-8. **Required roles** — only those justified by the task.
+7. **Reasoning** — FAST / STANDARD / DEEP.
+8. **Context** — LOCAL / CROSS-LAYER / SYSTEM.
+9. **Test depth** — TARGETED / EXPANDED / FULL.
+10. **External cost** — NONE / LOW / MATERIAL.
+11. **User-facing** — YES / NO.
+12. **Verification** — cheapest reliable test sequence.
+13. **Required roles** — only those justified by the task.
 
 If these are clear, implement immediately. Do not keep planning.
 
@@ -290,7 +353,7 @@ Core rule:
 Typical order:
 
 1. focused/unit test,
-2. affected integration/API test,
+2. affected integration/API/component test,
 3. relevant typecheck/lint/build,
 4. broader regression only at milestones or for high-risk changes.
 
@@ -435,13 +498,14 @@ A task is complete only when:
 
 1. required behavior exists in actual code,
 2. acceptance criteria are satisfied,
-3. required quality gates pass,
+3. required engineering/efficiency quality gates pass,
 4. no unresolved blocking QA/security issue remains,
-5. Normal User validation passes when required,
+5. user-facing tasks satisfy relevant `UX_UI_STANDARDS.md` criteria and Normal User validation when required,
 6. Verifier confirms evidence matches the requirement,
-7. PLAN/STATUS/TASK are updated truthfully,
-8. task-owned changes are committed safely,
-9. commit is pushed to the configured GitHub upstream or explicitly recorded `LOCAL ONLY` with reason.
+7. TASK records the actual reasoning/context/test-depth/external-cost result,
+8. PLAN/STATUS/TASK are updated truthfully,
+9. task-owned changes are committed safely,
+10. commit is pushed to the configured GitHub upstream or explicitly recorded `LOCAL ONLY` with reason.
 
 Do not mark complete because UI exists, compilation succeeds, mocks work, a commit exists, or a session is ending.
 
@@ -449,7 +513,7 @@ Do not mark complete because UI exists, compilation succeeds, mocks work, a comm
 
 # CCAF Principles
 
-**Move with urgency.**
+**Correctness before optimization.**
 
 **Use evidence, not assumptions.**
 
@@ -457,14 +521,20 @@ Do not mark complete because UI exists, compilation succeeds, mocks work, a comm
 
 **Read less, but read the right things.**
 
+**Use the minimum effective reasoning, context, agents, and tests.**
+
 **Use the cheapest reliable verification first.**
+
+**Modern UX should still feel familiar.**
+
+**Follow Jakob's Law unless a requirement justifies deviation.**
+
+**Dynamic and flexible must remain predictable.**
 
 **Commit only what the task owns.**
 
 **Sync verified checkpoints to GitHub.**
 
-**Escalate reasoning and reviewers only when risk requires it.**
-
 **Checkpoint before context is lost.**
 
-**Continue until approved requirements are genuinely implemented, verified, committed, and tracked.**
+**Continue until approved requirements are genuinely implemented, verified, efficient, user-ready, committed, and tracked.**
