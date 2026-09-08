@@ -20,7 +20,50 @@ Do not apply patterns mechanically. Use engineering judgment.
 
 ---
 
-# 2. Keep Changes Small and Cohesive
+# 2. Anti-Overengineering Rule
+
+Use the **least complex design that fully satisfies the current approved requirement and realistic known constraints**.
+
+Before adding any new abstraction, layer, dependency, service, queue, cache, event bus, generic framework, plugin system, repository pattern, factory, strategy, interface, or configuration subsystem, ask:
+
+1. Is there a concrete requirement that needs it now?
+2. Does an existing project pattern already solve this?
+3. Will the simpler implementation remain clear and testable?
+4. Is the added complexity smaller than the problem it removes?
+5. Can the decision be deferred safely until real variation appears?
+
+If the answer does not justify the complexity, do not add it.
+
+Avoid:
+
+- speculative abstractions,
+- architecture for hypothetical scale,
+- generic systems for one known case,
+- microservices where a module is sufficient,
+- caches without measured need,
+- queues without asynchronous/reliability need,
+- multiple layers that only forward calls,
+- interfaces with one implementation and no boundary/testability value,
+- configuration for values unlikely to vary,
+- premature optimization,
+- broad rewrites to solve local problems.
+
+Prefer **boring, explicit, maintainable code** over impressive complexity.
+
+## Complexity Budget
+
+Every work unit has a complexity budget proportional to its requirement.
+
+- Small requirement → small implementation.
+- Local bug → local fix unless root cause proves otherwise.
+- Simple feature → reuse current modules and patterns.
+- High-risk/system-wide requirement → deeper architecture only when justified.
+
+If the solution becomes much larger than the requirement, stop and reassess before continuing.
+
+---
+
+# 3. Keep Changes Small and Cohesive
 
 Prefer changes that have:
 
@@ -42,7 +85,7 @@ inside the same task unless they are truly inseparable.
 
 ---
 
-# 3. Write Clear, Intent-Revealing Code
+# 4. Write Clear, Intent-Revealing Code
 
 Prefer code that can be understood without excessive comments.
 
@@ -67,7 +110,7 @@ Comments should explain **why**, constraints, or non-obvious tradeoffs—not res
 
 ---
 
-# 4. SOLID — Apply Pragmatically
+# 5. SOLID — Apply Pragmatically
 
 Use SOLID principles when they reduce coupling or improve testability.
 
@@ -95,7 +138,7 @@ Depend on stable domain/service boundaries when that genuinely improves isolatio
 
 ---
 
-# 5. DRY, KISS, and YAGNI
+# 6. DRY, KISS, and YAGNI
 
 ## DRY
 
@@ -113,7 +156,7 @@ Do not implement hypothetical future requirements without evidence they are need
 
 ---
 
-# 6. Separate Concerns
+# 7. Separate Concerns
 
 Keep responsibilities at appropriate boundaries.
 
@@ -129,7 +172,7 @@ Follow the target project's architectural style rather than imposing a new one.
 
 ---
 
-# 7. Validate at Trust Boundaries
+# 8. Validate at Trust Boundaries
 
 Treat external input as untrusted.
 
@@ -149,7 +192,7 @@ Never rely only on client-side validation for server-side correctness or securit
 
 ---
 
-# 8. Secure by Default
+# 9. Secure by Default
 
 Apply least privilege and secure defaults.
 
@@ -175,7 +218,7 @@ Security decisions must be enforced server-side when a server exists.
 
 ---
 
-# 9. Design for Failure
+# 10. Design for Failure
 
 External systems fail.
 
@@ -197,7 +240,7 @@ Do not swallow errors silently.
 
 ---
 
-# 10. Error Handling
+# 11. Error Handling
 
 Errors should be:
 
@@ -214,7 +257,7 @@ Do not use exceptions/errors as normal control flow when a clearer approach exis
 
 ---
 
-# 11. Data Integrity
+# 12. Data Integrity
 
 For persistent data changes consider:
 
@@ -234,7 +277,7 @@ Migrations should be deterministic and safe for the project's deployment model.
 
 ---
 
-# 12. API Engineering
+# 13. API Engineering
 
 Maintain consistent:
 
@@ -253,7 +296,7 @@ For breaking changes, document migration impact and update consumers in the same
 
 ---
 
-# 13. Frontend Engineering
+# 14. Frontend Engineering
 
 User-facing features should handle applicable states:
 
@@ -275,7 +318,7 @@ Preserve familiar interaction patterns and existing product identity.
 
 ---
 
-# 14. Accessibility
+# 15. Accessibility
 
 For user-facing work, preserve or improve accessibility.
 
@@ -295,7 +338,7 @@ Do not sacrifice accessibility for cosmetic convenience.
 
 ---
 
-# 15. Performance Engineering
+# 16. Performance Engineering
 
 Do not optimize blindly.
 
@@ -315,7 +358,7 @@ Prefer correctness and maintainability over micro-optimization without evidence.
 
 ---
 
-# 16. Resource and Cost Awareness
+# 17. Resource and Cost Awareness
 
 For systems using paid APIs, cloud resources, AI models, storage, queues, or third-party services:
 
@@ -331,7 +374,7 @@ Cost efficiency must not weaken correctness or security.
 
 ---
 
-# 17. Testing Practices
+# 18. Testing Practices
 
 Test behavior, not implementation trivia.
 
@@ -356,7 +399,7 @@ Never delete or weaken a valid test merely to make CI green.
 
 ---
 
-# 18. Testability
+# 19. Testability
 
 New logic should be structured so important behavior can be tested without unreasonable setup.
 
@@ -366,7 +409,7 @@ Do not introduce dependency injection ceremony if the project does not need it.
 
 ---
 
-# 19. Observability
+# 20. Observability
 
 For production-relevant backend/infrastructure work, preserve useful observability.
 
@@ -390,7 +433,7 @@ Avoid noisy logging that makes real failures harder to find.
 
 ---
 
-# 20. Configuration
+# 21. Configuration
 
 Environment-specific values belong in appropriate configuration, not source constants.
 
@@ -401,7 +444,7 @@ Environment-specific values belong in appropriate configuration, not source cons
 
 ---
 
-# 21. Dependencies
+# 22. Dependencies
 
 Before adding a dependency:
 
@@ -416,7 +459,7 @@ Do not perform unrelated dependency upgrades inside feature work.
 
 ---
 
-# 22. Concurrency and Idempotency
+# 23. Concurrency and Idempotency
 
 When operations can run concurrently or repeat, explicitly consider:
 
@@ -432,7 +475,7 @@ Use database constraints, transactions, locks, optimistic concurrency, idempoten
 
 ---
 
-# 23. Documentation
+# 24. Documentation
 
 Update documentation when a change affects:
 
@@ -450,7 +493,33 @@ Prefer documentation near the source of truth.
 
 ---
 
-# 24. Git and Change History
+# 25. Maintenance Engineering
+
+Maintenance is a continuous part of engineering, but it must remain proportional.
+
+Prefer incremental maintenance that protects:
+
+- critical tests,
+- dependency/security health,
+- build/CI reliability,
+- migrations/config examples,
+- production observability,
+- deprecated/stale code removal,
+- setup/deployment/public API documentation.
+
+Maintenance must not become an excuse for broad rewrites.
+
+When many maintenance opportunities exist:
+
+1. fix the requested or highest-risk item,
+2. record meaningful remaining debt,
+3. defer unrelated cleanup.
+
+Use `workflows/maintenance.md` for maintenance prompts.
+
+---
+
+# 26. Git and Change History
 
 Commits should be:
 
@@ -468,7 +537,7 @@ Do not rewrite shared Git history without explicit authorization.
 
 ---
 
-# 25. Refactoring Rule
+# 27. Refactoring Rule
 
 Refactor when needed to safely implement the requirement or remove material risk.
 
@@ -478,7 +547,7 @@ A refactor performed alongside behavior change should preserve existing behavior
 
 ---
 
-# 26. Compatibility and Migration
+# 28. Compatibility and Migration
 
 When changing schemas, APIs, config, persisted formats, or public behavior:
 
@@ -489,7 +558,7 @@ When changing schemas, APIs, config, persisted formats, or public behavior:
 
 ---
 
-# 27. Definition of High-Quality Code
+# 29. Definition of High-Quality Code
 
 High-quality CCAF work is:
 
@@ -502,7 +571,8 @@ High-quality CCAF work is:
 - observable where needed,
 - resilient to realistic failure,
 - appropriately performant,
-- easy for the next engineer to maintain.
+- easy for the next engineer to maintain,
+- no more complex than necessary.
 
 It is **not** code with the most abstractions, patterns, files, or comments.
 
@@ -510,4 +580,4 @@ It is **not** code with the most abstractions, patterns, files, or comments.
 
 # Final Rule
 
-**Prefer the simplest production-quality solution that satisfies the approved requirement, fits the existing architecture, and can be proven with evidence.**
+**Prefer the simplest production-quality solution that satisfies the approved requirement, fits the existing architecture, can be maintained cheaply, and can be proven with evidence.**
