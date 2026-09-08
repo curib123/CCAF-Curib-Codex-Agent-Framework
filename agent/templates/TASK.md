@@ -4,6 +4,7 @@ Task ID:
 Requirement:
 Task Type: BUGFIX | FEATURE | MAINTENANCE | GENERAL
 Risk: LOW | MEDIUM | HIGH
+Execution Path: FAST | STANDARD | GUARDED
 
 ## Adaptive Routing
 
@@ -24,21 +25,15 @@ User-Facing: YES | NO
 
 One coherent result to achieve.
 
-## Current Behavior
+## Current → Required
 
-What the existing system does now.
-
-## Required Behavior
-
-What must be true when this task is complete.
+Current:
+Required:
 
 ## Scope
 
-- ...
-
-## Non-Scope
-
-- ...
+In:
+Out:
 
 ## Relevant Paths
 
@@ -51,36 +46,34 @@ What must be true when this task is complete.
 
 ## UX/UI Criteria
 
-Complete only when `User-Facing: YES`.
+Only when `User-Facing: YES` and relevant to the change.
 
-- [ ] Familiar interaction pattern / Jakob's Law
-- [ ] Responsive behavior
-- [ ] Loading / empty / error / success states as applicable
-- [ ] Accessibility basics
-- [ ] Design-system consistency
-- [ ] Clear primary action / recovery
-- [ ] Dynamic behavior uses real state/config rather than unnecessary hard-coding
+- [ ] Familiar/Jakob-friendly interaction
+- [ ] Responsive/accessibility states handled
+- [ ] Existing design system reused
+- [ ] Loading/error/empty/success behavior handled as needed
+- [ ] Dynamic behavior uses real state/config when applicable
 
 ## Required Roles
 
 - Engineer
-- QA / Security / Normal User / Verifier only as justified by risk and impact
+- Verifier
+- Add QA / Security / Normal User only when risk/impact justifies them
 
-## Targeted Verification
+## Verification
 
 1. ...
 2. ...
 
-## Evidence / Result
+## Result
 
 Not started.
 
 ## Efficiency Result
 
-Model/routing used:
+Route/model used:
 Context used:
-Reasoning used:
-Test depth used:
+Tests used:
 External/API cost notes:
 Avoided unnecessary work:
 
@@ -98,3 +91,9 @@ None.
 ## NEXT ACTION
 
 ...
+
+---
+
+## FAST PATH Compactness Rule
+
+For tiny LOW-risk tasks, keep this file very short. A valid FAST task may use one-line entries for Current/Required, Scope, Acceptance, Verification, and Result. Do not create verbose state just to satisfy the template.
