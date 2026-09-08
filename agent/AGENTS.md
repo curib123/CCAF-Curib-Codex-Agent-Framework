@@ -17,9 +17,21 @@ close the gap between the current implementation and the approved requirements.
 
 Use:
 
-**Understand → Plan → Implement → Test → QA → Review → Verify → Checkpoint → Repeat**
+**Understand → Plan → Implement → Test → QA → Review → Verify → Checkpoint → Git Sync → Repeat**
 
 The existing codebase is the implementation source of truth. `REQUIREMENTS.md` is the product source of truth.
+
+---
+
+# Codex Entrypoint Rule
+
+To make every Codex prompt use CCAF, place a root/project `AGENTS.md` based on:
+
+`agent/templates/CODEX_ROOT_AGENTS.md`
+
+That entrypoint must direct every project-work prompt through this file before implementation.
+
+Short prompts such as `continue`, `fix login`, `add search`, or `make responsive` still create or continue a CCAF work unit. They do not bypass state, verification, or Git discipline.
 
 ---
 
@@ -87,17 +99,13 @@ Do **not** invoke every role for every task.
 
 Perform broad repository discovery only when project state is missing, stale, or insufficient.
 
-Persist stable discoveries in:
-
-`state/FACTS.md`
+Persist stable discoveries in `state/FACTS.md`.
 
 Future sessions should navigate from persisted facts instead of rediscovering the whole repository.
 
 ## 2. Use a Current Task Packet
 
-Every active work unit must be represented by:
-
-`state/TASK.md`
+Every active work unit must be represented by `state/TASK.md`.
 
 `TASK.md` is the cheapest resume context and must contain only what is needed to finish the current unit:
 
@@ -112,6 +120,7 @@ Every active work unit must be represented by:
 - Required reviewers
 - Targeted verification
 - Current result
+- Git checkpoint
 - Next action
 
 When `TASK.md` is valid, read it **before** loading broad PLAN/FACTS content.
@@ -156,9 +165,7 @@ They should not independently re-analyze the full project unless the diff expose
 
 ## 6. Bounded Agent Work
 
-A normal task should usually need only:
-
-**Engineer + QA + Verifier**
+A normal task should usually need only **Engineer + QA + Verifier**.
 
 Specialist reviews are additive only when triggered by risk or user-facing impact.
 
@@ -222,6 +229,10 @@ Compact execution pointer only:
 - Last Completed
 - Blockers
 - Last Verification
+- Git Repository
+- Git Branch
+- Git Commit
+- Git Sync
 - NEXT ACTION
 
 ## TASK.md
@@ -287,6 +298,52 @@ Compilation alone is not proof of behavior.
 
 ---
 
+# Git and GitHub Checkpoint Contract
+
+Use `workflows/github-sync.md` after a work unit is verified.
+
+A normal completed CCAF unit must end with:
+
+**IMPLEMENTED → VERIFIED → STATE CHECKPOINTED → SAFE DIFF REVIEWED → COMMITTED → PUSHED**
+
+If push cannot be completed safely, record:
+
+`Git Sync: LOCAL ONLY`
+
+with the exact reason.
+
+## Commit safety
+
+Before staging:
+
+1. inspect Git status/diff,
+2. identify exactly which files belong to the task,
+3. preserve unrelated dirty work,
+4. stage only task-owned changes,
+5. inspect the staged diff,
+6. check for secrets/generated/unintended files.
+
+Do not use broad staging when unrelated changes exist.
+
+Never create a commit that silently includes pre-existing user edits.
+
+## Sync safety
+
+Before push:
+
+- know the current branch,
+- know the remote/upstream,
+- fetch remote state when appropriate,
+- never force push by default,
+- do not overwrite remote history,
+- respect existing branch/PR conventions.
+
+Record the branch, full commit SHA when available, and sync result in `STATUS.md` and `TASK.md`.
+
+Git synchronization is part of the checkpoint, not a substitute for verification.
+
+---
+
 # Failure and Stall Handling
 
 Classify failures as:
@@ -321,6 +378,7 @@ Read:
 1. `AGENTS.md`
 2. project `REQUIREMENTS.md`
 3. existing repository structure
+4. Git repository/branch/remote state
 
 Initialize FACTS, PLAN, STATUS, and TASK, then immediately begin the highest-priority actionable task.
 
@@ -331,9 +389,10 @@ Read in this order:
 1. `STATUS.md`
 2. `TASK.md`
 3. current Git status/diff
-4. only the requirement/facts needed by that task
+4. current branch/upstream state
+5. only the requirement/facts needed by that task
 
-Verify checkpoint accuracy against actual code, then continue `NEXT ACTION`.
+Verify checkpoint accuracy against actual code and Git history, then continue `NEXT ACTION`.
 
 Do **not** perform a fresh full-project analysis unless persisted facts are missing or stale.
 
@@ -345,11 +404,11 @@ CCAF cannot bypass platform usage limits. It must make interruption cheap.
 
 After every meaningful unit:
 
-**CODE → TARGETED EVIDENCE → VERIFY → CHECKPOINT**
+**CODE → TARGETED EVIDENCE → VERIFY → STATE CHECKPOINT → COMMIT → SYNC**
 
 Before context becomes large, update `TASK.md` and `STATUS.md`.
 
-A new session should be able to continue from these files without needing the previous conversation.
+A new session should be able to continue from repository state plus Git history without needing the previous conversation.
 
 ---
 
@@ -380,9 +439,11 @@ A task is complete only when:
 4. no unresolved blocking QA/security issue remains,
 5. Normal User validation passes when required,
 6. Verifier confirms evidence matches the requirement,
-7. PLAN/STATUS/TASK are updated truthfully.
+7. PLAN/STATUS/TASK are updated truthfully,
+8. task-owned changes are committed safely,
+9. commit is pushed to the configured GitHub upstream or explicitly recorded `LOCAL ONLY` with reason.
 
-Do not mark complete because UI exists, compilation succeeds, mocks work, or a session is ending.
+Do not mark complete because UI exists, compilation succeeds, mocks work, a commit exists, or a session is ending.
 
 ---
 
@@ -398,8 +459,12 @@ Do not mark complete because UI exists, compilation succeeds, mocks work, or a s
 
 **Use the cheapest reliable verification first.**
 
+**Commit only what the task owns.**
+
+**Sync verified checkpoints to GitHub.**
+
 **Escalate reasoning and reviewers only when risk requires it.**
 
 **Checkpoint before context is lost.**
 
-**Continue until approved requirements are genuinely implemented and verified.**
+**Continue until approved requirements are genuinely implemented, verified, committed, and tracked.**
