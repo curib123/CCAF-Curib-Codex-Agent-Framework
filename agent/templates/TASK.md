@@ -2,8 +2,19 @@
 
 Task ID:
 Requirement:
+Task Type: BUGFIX | FEATURE | MAINTENANCE | GENERAL
 Risk: LOW | MEDIUM | HIGH
-Reasoning: FAST | STANDARD | DEEP
+
+## Adaptive Routing
+
+Routing Mode: AUTO | MANUAL
+Recommended Model Tier: ECONOMY | BALANCED | PREMIUM
+Applied Model: ACTIVE DEFAULT | UNKNOWN | <model name>
+Reasoning Effort: LOW | MEDIUM | HIGH | XHIGH | MAX | HOST DEFAULT
+Switch Status: APPLIED | RECOMMENDED ONLY | MANUAL | NOT SUPPORTED
+
+## Efficiency Profile
+
 Context: LOCAL | CROSS-LAYER | SYSTEM
 Test Depth: TARGETED | EXPANDED | FULL
 External Cost: NONE | LOW | MATERIAL
@@ -66,6 +77,7 @@ Not started.
 
 ## Efficiency Result
 
+Model/routing used:
 Context used:
 Reasoning used:
 Test depth used:
