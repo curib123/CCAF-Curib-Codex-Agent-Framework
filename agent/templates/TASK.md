@@ -3,6 +3,11 @@
 Task ID:
 Requirement:
 Risk: LOW | MEDIUM | HIGH
+Reasoning: FAST | STANDARD | DEEP
+Context: LOCAL | CROSS-LAYER | SYSTEM
+Test Depth: TARGETED | EXPANDED | FULL
+External Cost: NONE | LOW | MATERIAL
+User-Facing: YES | NO
 
 ## Objective
 
@@ -33,6 +38,18 @@ What must be true when this task is complete.
 - [ ] ...
 - [ ] ...
 
+## UX/UI Criteria
+
+Complete only when `User-Facing: YES`.
+
+- [ ] Familiar interaction pattern / Jakob's Law
+- [ ] Responsive behavior
+- [ ] Loading / empty / error / success states as applicable
+- [ ] Accessibility basics
+- [ ] Design-system consistency
+- [ ] Clear primary action / recovery
+- [ ] Dynamic behavior uses real state/config rather than unnecessary hard-coding
+
 ## Required Roles
 
 - Engineer
@@ -46,6 +63,14 @@ What must be true when this task is complete.
 ## Evidence / Result
 
 Not started.
+
+## Efficiency Result
+
+Context used:
+Reasoning used:
+Test depth used:
+External/API cost notes:
+Avoided unnecessary work:
 
 ## Git Checkpoint
 
