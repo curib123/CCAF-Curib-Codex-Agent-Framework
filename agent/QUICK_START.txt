@@ -1,0 +1,32 @@
+UNIVERSAL QUICK START
+
+1. Place agent/ beside any existing project.
+
+Example:
+workspace/
+  agent/
+  YourProject/
+
+2. Copy:
+agent/projects/_example/
+
+to:
+agent/projects/my-project/
+
+3. Put Planning + Requirements Analysis into:
+agent/projects/my-project/REQUIREMENTS.md
+
+4. Start:
+
+Read ./agent/AGENTS.md.
+Target project: ./YourProject
+Requirements: ./agent/projects/my-project/REQUIREMENTS.md
+Start the professional existing-project development loop.
+
+5. Resume after usage/session interruption:
+
+Read ./agent/AGENTS.md.
+Resume ./YourProject from ./agent/projects/my-project/state/.
+Continue from NEXT ACTION without redoing completed work.
+
+The agent framework is stack-agnostic and project-agnostic.
