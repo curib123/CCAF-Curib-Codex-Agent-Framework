@@ -6,12 +6,12 @@ Describe the problem the system must solve.
 
 ## Proposed Solution
 
-Describe the product/system direction.
+Describe the intended product/system direction.
 
 ## Goals
 
-- Goal 1
-- Goal 2
+- G-01 ...
+- G-02 ...
 
 ## Scope
 
@@ -27,7 +27,7 @@ Describe the product/system direction.
 
 - ...
 
-## Budget Considerations
+## Budget / Cost Constraints
 
 - ...
 
@@ -37,42 +37,86 @@ Describe the product/system direction.
 
 # Requirements Analysis
 
+Use stable IDs whenever possible. IDs make implementation and verification traceable.
+
 ## Functional Requirements
 
-### FR-01
+### FR-01 — Title
+
+Required behavior:
 
 ...
 
-### FR-02
+Acceptance evidence:
+
+- ...
+
+### FR-02 — Title
+
+Required behavior:
 
 ...
 
-## Non-Functional Requirements
+Acceptance evidence:
 
-### Security
+- ...
 
-...
+## Security Requirements
 
-### Performance
-
-...
-
-### Reliability
+### SEC-01 — Title
 
 ...
 
-### Scalability
+## Reliability Requirements
+
+### REL-01 — Title
 
 ...
 
-### Usability
+## Performance Requirements
+
+### PERF-01 — Title
 
 ...
 
-### Maintainability
+## Usability Requirements
+
+### UX-01 — Title
 
 ...
 
-# Acceptance Criteria
+## Operational / Deployment Requirements
 
-Describe the main end-to-end flows that must work before the project is considered complete.
+### OPS-01 — Title
+
+...
+
+## Maintainability Requirements
+
+### MNT-01 — Title
+
+...
+
+# End-to-End Acceptance Criteria
+
+### AC-01 — Primary Flow
+
+Describe the observable end-to-end behavior that must work before the project is considered complete.
+
+### AC-02 — Failure / Recovery Flow
+
+Describe important failure, retry, refresh, authorization, or recovery behavior.
+
+# Requirement Quality Rules
+
+Prefer requirements that describe observable behavior rather than implementation preference.
+
+Good:
+
+`FR-03: An authenticated user can rename their own project and the new name persists after refresh.`
+
+Weaker:
+
+`Use a renameProject service.`
+
+Implementation details may be included when they are genuine constraints, but the agent framework should otherwise discover the best fit for the existing architecture.
